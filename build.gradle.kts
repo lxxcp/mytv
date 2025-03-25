@@ -1,10 +1,7 @@
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.android.build.gradle.tasks.PackageAndroidArtifact
-import java.io.FileInputStream
-import java.util.Properties
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
@@ -14,28 +11,23 @@ plugins {
     alias(libs.plugins.kotlin.serialization) apply false
 }
 
-val keystorePropertiesFile = rootProject.file("key.properties")
-val keystoreProperties = Properties()
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
-}
-
 allprojects {
     val appConfig: BaseAppModuleExtension.() -> Unit = {
         signingConfigs {
-            val localKeystore = rootProject.file("keystore.jks")
-            val userKeystore = file(
-                System.getenv("KEYSTORE") ?: keystoreProperties.getProperty("storeFile")
-                ?: "keystore.jks"
-            )
-
             create("release") {
-                storeFile = if (userKeystore.exists()) userKeystore else localKeystore
-                storePassword = System.getenv("KEYSTORE_PASSWORD")
-                    ?: keystoreProperties.getProperty("storePassword")
-                keyAlias = System.getenv("KEY_ALIAS") ?: keystoreProperties.getProperty("keyAlias")
-                keyPassword =
-                    System.getenv("KEY_PASSWORD") ?: keystoreProperties.getProperty("keyPassword")
+                storeFile = file(System.getenv("KEYSTORE") ?: "keystore.p12")
+                storeType = System.getenv("KEYSTORE_TYPE") ?: "PKCS12"
+                storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
+                keyAlias = System.getenv("KEY_ALIAS") ?: ""
+                keyPassword = System.getenv("KEY_PASSWORD") ?: ""
+            }
+        }
+
+        buildTypes {
+            getByName("release") {
+                signingConfig = signingConfigs.getByName("release")
+                isMinifyEnabled = true
+                proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
             }
         }
 
@@ -44,10 +36,8 @@ allprojects {
                 val ver = defaultConfig.versionName
                 val minSdk = defaultConfig.minSdk
                 val abi = filters.find { it.filterType == "ABI" }?.identifier ?: "all"
-                val flavor = productFlavors.joinToString("-") { it.name }
-
                 (this as BaseVariantOutputImpl).outputFileName =
-                    "mytv-android-${project.name}-$ver-${abi}-sdk$minSdk-${flavor}.apk"
+                    "mytv-android-${project.name}-$ver-${abi}-sdk$minSdk-release.apk"
             }
         }
     }
@@ -58,10 +48,11 @@ allprojects {
         doLast {
             val outputDir = outputDirectory.get().asFile
             val targetDir = file("$outputDir/../../release")
-
-            if (!targetDir.exists()) targetDir.mkdirs()
-
+            targetDir.mkdirs()
+            
+            println("=== 生成的APK文件 ===")
             outputDir.listFiles { file -> file.extension == "apk" }?.forEach { apkFile ->
+                println("发现APK: ${apkFile.absolutePath}")
                 apkFile.copyTo(file("${targetDir}/${apkFile.name}"), overwrite = true)
             }
         }
