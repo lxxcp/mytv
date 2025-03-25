@@ -2,16 +2,20 @@ name: Kotlin CI
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+    inputs:
+      version:
+        description: "输入版本号（格式：x.x.x，例如 1.2.3）"
+        required: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      KEYSTORE_PATH: app/keystore.p12
+      KEYSTORE_TYPE: PKCS12
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
     steps:
     - name: Checkout code
@@ -24,14 +28,40 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
+    - name: 解码生成 p12
+      run: |
+        mkdir -p app
+        echo "正在解码BASE64密钥..."
+        openssl base64 -d -A <<< "${{ secrets.KEYSTORE_BASE64 }}" > $KEYSTORE_PATH
+        echo "=== 调试信息 ==="
+        ls -l app/ | grep keystore
+        if [ ! -s $KEYSTORE_PATH ]; then
+          echo "❌ 错误：keystore.p12 文件为空"
+          exit 1
+        fi
+        echo "✅ 解码成功，文件路径: $KEYSTORE_PATH"
+        echo "文件大小: $(stat -c%s $KEYSTORE_PATH) 字节"
+        
+        echo "验证密钥库完整性..."
+        keytool -list -v \
+          -keystore $KEYSTORE_PATH \
+          -storepass $KEYSTORE_PASSWORD \
+          -storetype $KEYSTORE_TYPE
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+
     - name: Build with Gradle
       run: ./gradlew :tv:assembleRelease
-    
+      env:
+        KEYSTORE: ${{ env.KEYSTORE_PATH }}
+        KEYSTORE_TYPE: ${{ env.KEYSTORE_TYPE }}
+        KEYSTORE_PASSWORD: ${{ env.KEYSTORE_PASSWORD }}
+        KEY_ALIAS: ${{ env.KEY_ALIAS }}
+        KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
+
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: mytv-android-tv-3.3.7-all-sdk21-original.apk
-        path: tv/original/release/mytv-android-tv-3.3.7-all-sdk21-original.apk
-    
+        name: mytv-android-tv-${{ inputs.version }}-release.apk
+        path: tv/build/outputs/apk/release/*.apk
