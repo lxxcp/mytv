@@ -10,6 +10,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: keystore
     env:
       KEYSTORE_PATH: app/keystore.p12
       KEYSTORE_TYPE: PKCS12
