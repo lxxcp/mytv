@@ -44,12 +44,11 @@ allprojects {
 
         applicationVariants.all {
             outputs.all {
-                val ver = defaultConfig.versionName
-                val minSdk = defaultConfig.minSdk
-                val abi = filters.find { it.filterType == "ABI" }?.identifier ?: "all"
-                (this as BaseVariantOutputImpl).outputFileName =
-                    "mytv-android-${project.name}-$ver-${abi}-sdk$minSdk-release.apk"
-            }
+                outputs.all {
+                  val versionName = System.getenv("VERSION_NAME") ?: "3.3.7"
+                  (this as BaseVariantOutputImpl).outputFileName = 
+                       "mytv-android-tv-${versionName}-all-sdk21-release.apk"
+               }
         }
     }
 
