@@ -60,8 +60,11 @@ jobs:
       run: chmod +x gradlew
 
     - name: Build with Gradle
-      run: ./gradlew :tv:assembleRelease --stacktrace
+      run: |
+        ./gradlew clean  # 清理缓存
+        ./gradlew :tv:assembleRelease --stacktrace -PVERSION_NAME=${{ github.event.inputs.version }}  # 传递版本号
       env:
+        VERSION_NAME: ${{ github.event.inputs.version }}  # 环境变量传递
         KEYSTORE: ${{ github.workspace }}/tv/app/keystore.p12
         KEYSTORE_TYPE: ${{ env.KEYSTORE_TYPE }}
         KEYSTORE_PASSWORD: ${{ env.KEYSTORE_PASSWORD }}
