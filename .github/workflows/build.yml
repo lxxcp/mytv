@@ -63,7 +63,7 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew :tv:assembleRelease --stacktrace
       env:
-        KEYSTORE: ${{ env.KEYSTORE_PATH }}  # 传递绝对路径
+        KEYSTORE: ${{ github.workspace }}/tv/app/keystore.p12  # Absolute path
         KEYSTORE_TYPE: ${{ env.KEYSTORE_TYPE }}
         KEYSTORE_PASSWORD: ${{ env.KEYSTORE_PASSWORD }}
         KEY_ALIAS: ${{ env.KEY_ALIAS }}
