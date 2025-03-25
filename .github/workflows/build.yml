@@ -8,7 +8,7 @@ on:
         required: true
   push:
     tags:
-      - "v*"  # 触发 Tag 推送
+      - "v*"  # 支持 Tag 触发
 
 jobs:
   build:
@@ -69,13 +69,13 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: mytv-android-tv-${{ github.ref_name }}-release.apk  # 使用 Tag 名称
+        name: mytv-android-tv-${{ github.event.inputs.version || github.ref_name }}-release.apk
         path: tv/build/outputs/apk/original/release/*.apk
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')
+      # 移除条件判断，始终执行
       with:
-        name: Release ${{ github.ref_name }}  # 示例：Release v3.3.8
-        body: "Android TV 版本 ${{ github.ref_name }}"
+        name: Release ${{ format('v{0}', github.event.inputs.version) || github.ref_name }}
+        body: "Android TV 版本 ${{ github.event.inputs.version || github.ref_name }}"
         files: tv/build/outputs/apk/original/release/*.apk
