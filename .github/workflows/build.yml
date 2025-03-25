@@ -68,7 +68,7 @@ jobs:
         KEY_ALIAS: ${{ env.KEY_ALIAS }}
         KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
 
-   - name: 上传 APK 到 Artifacts
+    - name: 上传 APK 到 Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: mytv-android-tv-${{ github.event.inputs.version || github.ref_name }}-release.apk
