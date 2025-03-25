@@ -8,7 +8,7 @@ on:
         required: true
   push:
     tags:
-      - "v*"  # 添加 Tag 触发
+      - "v*"  # 触发 Tag 推送
 
 jobs:
   build:
@@ -34,23 +34,17 @@ jobs:
 
     - name: 解码生成 p12
       run: |
-        mkdir -p tv/app  # 创建符合项目结构的目录
+        mkdir -p tv/app
         echo "正在解码BASE64密钥..."
-        
-        # 解码到正确路径
         openssl base64 -d -A <<< "${{ secrets.KEYSTORE_BASE64 }}" > $KEYSTORE_PATH
-        
         echo "=== 文件验证 ==="
         echo "当前工作目录: $(pwd)"
         echo "密钥库绝对路径: $(realpath $KEYSTORE_PATH)"
-        ls -lR tv/app  # 递归列出目录结构
-        
+        ls -lR tv/app
         if [ ! -s $KEYSTORE_PATH ]; then
           echo "❌ 错误：keystore.p12 文件为空"
           exit 1
         fi
-
-        # 密钥库有效性验证
         echo "验证密钥库..."
         keytool -list -v \
           -keystore $KEYSTORE_PATH \
@@ -66,22 +60,22 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew :tv:assembleRelease --stacktrace
       env:
-        KEYSTORE: ${{ github.workspace }}/tv/app/keystore.p12  # Absolute path
+        KEYSTORE: ${{ github.workspace }}/tv/app/keystore.p12
         KEYSTORE_TYPE: ${{ env.KEYSTORE_TYPE }}
         KEYSTORE_PASSWORD: ${{ env.KEYSTORE_PASSWORD }}
         KEY_ALIAS: ${{ env.KEY_ALIAS }}
         KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
 
-     - name: Upload Artifact
+    - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: mytv-android-tv-${{ inputs.version }}-release.apk
-        path: tv/build/outputs/apk/original/release/*.apk  # 修正路径
+        name: mytv-android-tv-${{ github.ref_name }}-release.apk  # 使用 Tag 名称
+        path: tv/build/outputs/apk/original/release/*.apk
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')  # 仅在 Tag 触发时发布
+      if: startsWith(github.ref, 'refs/tags/')
       with:
-        name: Release ${{ inputs.version }}
-        body: "Android TV 版本 ${{ inputs.version }}"
+        name: Release ${{ github.ref_name }}  # 示例：Release v3.3.8
+        body: "Android TV 版本 ${{ github.ref_name }}"
         files: tv/build/outputs/apk/original/release/*.apk
