@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization) apply false
 }
 
+
 allprojects {
     val appConfig: BaseAppModuleExtension.() -> Unit = {
         signingConfigs {
@@ -31,6 +32,16 @@ allprojects {
             }
         }
 
+        // 将文件验证移动到 buildTypes 配置中
+        afterEvaluate {
+            tasks.findByName("signRelease")?.doFirst {
+                val storeFile = signingConfigs.getByName("release").storeFile
+                if (storeFile == null || !storeFile.exists()) {
+                    throw GradleException("密钥库文件不存在: ${storeFile?.absolutePath}")
+                }
+            }
+        }
+
         applicationVariants.all {
             outputs.all {
                 val ver = defaultConfig.versionName
@@ -43,17 +54,6 @@ allprojects {
     }
 
     extra["appConfig"] = appConfig
-
-    afterEvaluate {
-        tasks.findByName("signRelease")?.let { signTask ->
-            signTask.doFirst {
-                val storeFile = signingConfigs.getByName("release").storeFile
-                require(storeFile?.exists() == true) {
-                    "密钥库文件不存在: ${storeFile?.absolutePath}"
-                }
-            }
-        }
-    }
 
     tasks.withType<PackageAndroidArtifact>().configureEach {
         doLast {
