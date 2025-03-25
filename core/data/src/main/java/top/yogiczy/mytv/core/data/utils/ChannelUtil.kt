@@ -8,6 +8,9 @@ import java.net.URL
 object ChannelUtil {
     private val hybridWebViewUrl by lazy {
         mapOf(
+            ChannelAlias.standardChannelName("CCTV4K") to listOf(
+                 "https://yangshipin.cn/tv/home?pid=600002264",
+            ),
             ChannelAlias.standardChannelName("cctv-1") to listOf(
                 "https://tv.cctv.com/live/cctv1/",
                 "https://yangshipin.cn/tv/home?pid=600001859",
@@ -79,6 +82,12 @@ object ChannelUtil {
             ChannelAlias.standardChannelName("cctv-17") to listOf(
                 "https://tv.cctv.com/live/cctv17/",
                 "https://yangshipin.cn/tv/home?pid=600001810"
+            ),
+             ChannelAlias.standardChannelName("CCTV4中文国际欧洲") to listOf(
+                "https://tv.cctv.com/live/cctveurope/index.shtml",
+            ),
+             ChannelAlias.standardChannelName("CCTV4中文国际美洲") to listOf(
+                "https://tv.cctv.com/live/cctvamerica/",
             ),
             ChannelAlias.standardChannelName("北京卫视") to listOf(
                 "https://www.brtn.cn/btv/btvsy_index",
