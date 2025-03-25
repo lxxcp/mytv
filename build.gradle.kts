@@ -15,20 +15,13 @@ allprojects {
     val appConfig: BaseAppModuleExtension.() -> Unit = {
         signingConfigs {
             create("release") {
-               // 使用环境变量路径
-               storeFile = file(System.getenv("KEYSTORE") ?: "keystore.p12")
-               storeType = System.getenv("KEYSTORE_TYPE") ?: "PKCS12"
-               storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
-               keyAlias = System.getenv("KEY_ALIAS") ?: ""
-               keyPassword = System.getenv("KEY_PASSWORD") ?: ""
-    
-              // 添加路径验证
-              doFirst {
-                  if (!storeFile!!.exists()) {
-                     throw GradleException("密钥库文件不存在: ${storeFile!!.absolutePath}")
-                  }
-    }
-}
+                storeFile = file(System.getenv("KEYSTORE") ?: "keystore.p12")
+                storeType = System.getenv("KEYSTORE_TYPE") ?: "PKCS12"
+                storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
+                keyAlias = System.getenv("KEY_ALIAS") ?: ""
+                keyPassword = System.getenv("KEY_PASSWORD") ?: ""
+            }
+        }
 
         buildTypes {
             getByName("release") {
@@ -50,6 +43,17 @@ allprojects {
     }
 
     extra["appConfig"] = appConfig
+
+    afterEvaluate {
+        tasks.findByName("signRelease")?.let { signTask ->
+            signTask.doFirst {
+                val storeFile = signingConfigs.getByName("release").storeFile
+                require(storeFile?.exists() == true) {
+                    "密钥库文件不存在: ${storeFile?.absolutePath}"
+                }
+            }
+        }
+    }
 
     tasks.withType<PackageAndroidArtifact>().configureEach {
         doLast {
