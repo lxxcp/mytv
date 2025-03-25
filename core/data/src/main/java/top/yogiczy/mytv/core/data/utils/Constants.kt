@@ -12,7 +12,8 @@ object Constants {
     /**
      * 应用 标题
      */
-    const val APP_TITLE = "电视直播"
+    const val APP_TITLE = "天光云影修改版
+"
 
     /**
      * 应用 代码仓库
@@ -31,7 +32,7 @@ object Constants {
         listOf(
             IptvSource(
                 name = "默认直播源",
-                url = "https://gh-proxy.com/https://raw.githubusercontent.com/0047ol/China-TV-Live-M3U8/refs/heads/main/tv.m3u",
+                url = "https://gh.tryxd.cn/https://raw.githubusercontent.com/lxxcp/live/main/jxiptv.txt",
             )
         )
     )
@@ -48,7 +49,7 @@ object Constants {
         listOf(
             EpgSource(
                 name = "默认节目单",
-                url = "https://e.erw.cc/all.xml.gz",
+                url = "https://gh.tryxd.cn/raw.githubusercontent.com/lxxcp/epg/main/e.xml.gz",
             )
         )
     )
@@ -68,7 +69,7 @@ object Constants {
      * {name|uppercase} 转成大写
      *
      */
-    const val CHANNEL_LOGO_PROVIDER = "https://gh-proxy.com/https://raw.githubusercontent.com/0047ol/China-TV-HD-Logo/refs/heads/main/icon/{name|lowercase}.png"
+    const val CHANNEL_LOGO_PROVIDER = "https://gh.tryxd.cn/https://raw.githubusercontent.com/lxxcp/live/main/logo/{name}.png"
 
     /**
      * GitHub加速代理地址
