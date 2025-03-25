@@ -24,6 +24,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # 获取完整 Git 历史记录
 
     - name: Set up JDK
       uses: actions/setup-java@v4
@@ -66,16 +68,25 @@ jobs:
         KEY_ALIAS: ${{ env.KEY_ALIAS }}
         KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
 
-    - name: Upload Artifact
+   - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: mytv-android-tv-${{ github.event.inputs.version || github.ref_name }}-release.apk
+        name: mytv-android-tv-${{ inputs.version }}-release.apk
         path: tv/build/outputs/apk/original/release/*.apk
+
+    - name: Create Git Tag (Manual Trigger)
+      if: ${{ github.event_name == 'workflow_dispatch' }}  # 仅在手动触发时运行
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        TAG_NAME="v${{ github.event.inputs.version }}"
+        git tag -a $TAG_NAME -m "Release $TAG_NAME"
+        git push origin $TAG_NAME
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
-      # 移除条件判断，始终执行
+      # 仅在创建 Tag 后触发
       with:
-        name: Release ${{ format('v{0}', github.event.inputs.version) || github.ref_name }}
-        body: "Android TV 版本 ${{ github.event.inputs.version || github.ref_name }}"
+        name: Release v${{ github.event.inputs.version || github.ref_name }}
+        body: "Android TV 版本 v${{ github.event.inputs.version || github.ref_name }}"
         files: tv/build/outputs/apk/original/release/*.apk
