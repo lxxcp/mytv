@@ -83,10 +83,10 @@ object ChannelUtil {
                 "https://tv.cctv.com/live/cctv17/",
                 "https://yangshipin.cn/tv/home?pid=600001810"
             ),
-             ChannelAlias.standardChannelName("CCTV4中文国际欧洲") to listOf(
+             ChannelAlias.standardChannelName("CCTV4欧洲") to listOf(
                 "https://tv.cctv.com/live/cctveurope/index.shtml",
             ),
-             ChannelAlias.standardChannelName("CCTV4中文国际美洲") to listOf(
+             ChannelAlias.standardChannelName("CCTV4美洲") to listOf(
                 "https://tv.cctv.com/live/cctvamerica/",
             ),
             ChannelAlias.standardChannelName("北京卫视") to listOf(
