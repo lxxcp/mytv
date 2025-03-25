@@ -12,8 +12,7 @@ object Constants {
     /**
      * 应用 标题
      */
-    const val APP_TITLE = "天光云影修改版
-"
+    const val APP_TITLE = "天光云影修改版"
 
     /**
      * 应用 代码仓库
