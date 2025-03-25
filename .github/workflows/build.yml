@@ -32,13 +32,33 @@ jobs:
       run: |
         mkdir -p app
         echo "正在解码BASE64密钥..."
-        openssl base64 -d -A <<< "${{ secrets.KEYSTORE_BASE64 }}" > $KEYSTORE_PATH
+        
+        # 调试：输出BASE64字符串长度
+        echo "BASE64长度: $(echo -n "${{ secrets.KEYSTORE_BASE64 }}" | wc -c) 字符"
+        
+        # 将BASE64保存到临时文件（用于调试）
+        echo "${{ secrets.KEYSTORE_BASE64 }}" > base64.tmp
+        echo "原始BASE64前100字符: $(head -c 100 base64.tmp)"
+        
+        # 解码并处理换行符
+        openssl base64 -d -A -in base64.tmp -out $KEYSTORE_PATH
+        OPENSSL_EXIT_CODE=$?
+        
         echo "=== 调试信息 ==="
-        ls -l app/ | grep keystore
-        if [ ! -s $KEYSTORE_PATH ]; then
-          echo "❌ 错误：keystore.p12 文件为空"
+        ls -l app/
+        echo "OpenSSL退出码: $OPENSSL_EXIT_CODE"
+        
+        if [ $OPENSSL_EXIT_CODE -ne 0 ]; then
+          echo "❌ OpenSSL解码失败"
           exit 1
         fi
+        
+        if [ ! -s $KEYSTORE_PATH ]; then
+          echo "❌ 错误：keystore.p12 文件为空"
+          hexdump -C $KEYSTORE_PATH  # 显示二进制内容
+          exit 1
+        fi
+        
         echo "✅ 解码成功，文件路径: $KEYSTORE_PATH"
         echo "文件大小: $(stat -c%s $KEYSTORE_PATH) 字节"
         
@@ -46,7 +66,10 @@ jobs:
         keytool -list -v \
           -keystore $KEYSTORE_PATH \
           -storepass $KEYSTORE_PASSWORD \
-          -storetype $KEYSTORE_TYPE
+          -storetype $KEYSTORE_TYPE || {
+            echo "❌ 密钥库验证失败";
+            exit 1;
+          }
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
