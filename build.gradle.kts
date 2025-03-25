@@ -44,11 +44,10 @@ allprojects {
 
         applicationVariants.all {
             outputs.all {
-                outputs.all {
-                  val versionName = System.getenv("VERSION_NAME") ?: "3.3.7"
-                  (this as BaseVariantOutputImpl).outputFileName = 
-                       "mytv-android-tv-${versionName}-all-sdk21-release.apk"
-               }
+            val versionName = System.getenv("VERSION_NAME") ?: "3.3.7"
+            (this as BaseVariantOutputImpl).outputFileName = 
+                "mytv-android-tv-${versionName}-all-sdk21-release.apk"
+            }
         }
     }
 
