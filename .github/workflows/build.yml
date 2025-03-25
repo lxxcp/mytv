@@ -68,7 +68,7 @@ jobs:
         KEY_ALIAS: ${{ env.KEY_ALIAS }}
         KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
 
-   - name: Upload Artifact
+    - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: mytv-android-tv-${{ inputs.version }}-release.apk
