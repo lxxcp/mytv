@@ -75,11 +75,17 @@ jobs:
         path: tv/build/outputs/apk/original/release/*.apk
 
     - name: 动态创建 Tag（手动触发时）
-      if: ${{ github.event_name == 'workflow_dispatch' }}  # 仅在手动触发时运行
+      if: ${{ github.event_name == 'workflow_dispatch' }}
       run: |
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@github.com"
         TAG_NAME="v${{ github.event.inputs.version }}"
+        git fetch --tags
+        if git rev-parse $TAG_NAME >/dev/null 2>&1; then
+          echo "⚠️ 标签 $TAG_NAME 已存在，强制更新..."
+          git tag -d $TAG_NAME || true
+          git push --delete origin $TAG_NAME || true
+        fi
         git tag -a $TAG_NAME -m "Release $TAG_NAME"
         git push origin $TAG_NAME
 
@@ -89,6 +95,6 @@ jobs:
         name: Release v${{ github.event.inputs.version || github.ref_name }}
         tag: v${{ github.event.inputs.version || github.ref_name }}
         token: ${{ secrets.GITHUB_TOKEN }}
-        artifacts: tv/build/outputs/apk/original/release/*.apk  # 直接指定 APK 路径
-        allowUpdates: true  # 允许更新现有 Release
-        generateReleaseNotes: true  # 自动生成 Release 说明
+        artifacts: tv/build/outputs/apk/original/release/*.apk
+        allowUpdates: true
+        generateReleaseNotes: true
