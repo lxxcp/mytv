@@ -278,7 +278,7 @@ object ChannelUtil {
                 "https://www.hnntv.cn/live.html?playType=livePlay&channelId=5",
             ),
             ChannelAlias.standardChannelName("延边卫视") to listOf(
-                "https://www.yb983.cn/cys/index.html",
+                "https://www.yb983.com/cys/",
             ),
             ChannelAlias.standardChannelName("农林卫视") to listOf(
                 "http://live.snrtv.com/nl",
