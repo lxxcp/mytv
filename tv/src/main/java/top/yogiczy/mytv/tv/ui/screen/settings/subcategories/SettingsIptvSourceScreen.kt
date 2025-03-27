@@ -75,7 +75,7 @@ fun SettingsIptvSourceScreen(
     onClearCache: (IptvSource) -> Unit = {},
     onBackPressed: () -> Unit = {},
 ) {
-    val iptvSourceList = IptvSourceList(iptvSourceListProvider())
+    val iptvSourceList = IptvSourceList(Constants.IPTV_SOURCE_LIST + iptvSourceListProvider())
 
     val coroutineScope = rememberCoroutineScope()
     val iptvSourceDetails = remember { mutableStateMapOf<Int, IptvSourceDetail>() }
