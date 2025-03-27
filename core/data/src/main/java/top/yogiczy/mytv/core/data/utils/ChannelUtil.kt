@@ -231,7 +231,7 @@ object ChannelUtil {
                 "https://yangshipin.cn/tv/home?pid=600190405"
             ),
             ChannelAlias.standardChannelName("陕西卫视") to listOf(
-                "http://www.sxtvs.com/sxtvs_sxws/index.html",
+                "http://live.snrtv.com/star",
                 "https://yangshipin.cn/tv/home?pid=600190400"
             ),
             ChannelAlias.standardChannelName("甘肃卫视") to listOf(
@@ -309,14 +309,14 @@ object ChannelUtil {
             ),ChannelAlias.standardChannelName("南昌资讯") to listOf(
                 "https://www.nctv.net.cn/live?channel=3",
             ),
-            ChannelAlias.standardChannelName("cetv1") to listOf(
+            ChannelAlias.standardChannelName("CETV1") to listOf(
                 "https://yangshipin.cn/tv/home?pid=600171827",
                 "https://tv.gxtv.cn/channel/channelivePlay_ffa6b6e1b32b4a16a73eb3ef66f8bfc7.html",
             ),
-            ChannelAlias.standardChannelName("cetv2") to listOf(
+            ChannelAlias.standardChannelName("CETV2") to listOf(
                 "https://tv.gxtv.cn/channel/channelivePlay_80d0ffb42c114eaf9663708629ff0a3e.html",
             ),
-            ChannelAlias.standardChannelName("cetv4") to listOf(
+            ChannelAlias.standardChannelName("CETV4") to listOf(
                 "https://tv.gxtv.cn/channel/channelivePlay_67eace939278435bb4bca90800fb4225.html",
             ),
         )
