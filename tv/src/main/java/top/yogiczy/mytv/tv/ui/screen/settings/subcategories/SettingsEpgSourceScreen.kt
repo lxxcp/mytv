@@ -68,7 +68,7 @@ fun SettingsEpgSourceScreen(
     onClearCache: (EpgSource) -> Unit = {},
     onBackPressed: () -> Unit = {},
 ) {
-    val epgSourceList = epgSourceListProvider()
+    val epgSourceList = Constants.EPG_SOURCE_LIST + epgSourceListProvider()
 
     val childPadding = rememberChildPadding()
     val listState = rememberLazyListState()
