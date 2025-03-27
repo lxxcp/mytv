@@ -287,6 +287,26 @@ object ChannelUtil {
             ChannelAlias.standardChannelName("康巴卫视") to listOf(
                 "https://www.kangbatv.com/zb_22587/",
             ),
+             ChannelAlias.standardChannelName("山东教育") to listOf(
+                "https://www.sdetv.com.cn/edu/pc/live/index.html",
+            ),
+             ChannelAlias.standardChannelName("嘉佳卡通") to listOf(
+                "https://www.gdtv.cn/tvChannelDetail/66",
+            ),
+             ChannelAlias.standardChannelName("哈哈炫动") to listOf(
+                "https://live.kankanews.com/huikan?id=9",
+            ),
+            ChannelAlias.standardChannelName("第一财经") to listOf(
+                "https://live.kankanews.com/huikan?id=5",
+            ),
+             ChannelAlias.standardChannelName("南昌新闻综合") to listOf(
+                "https://www.nctv.net.cn/live?channel=1",
+            ),
+            ChannelAlias.standardChannelName("南昌文旅") to listOf(
+                "https://www.nctv.net.cn/live?channel=2",
+            ),ChannelAlias.standardChannelName("南昌资讯") to listOf(
+                "https://www.nctv.net.cn/live?channel=3",
+            ),
             ChannelAlias.standardChannelName("cetv-1") to listOf(
                 "https://yangshipin.cn/tv/home?pid=600171827",
                 "https://tv.gxtv.cn/channel/channelivePlay_ffa6b6e1b32b4a16a73eb3ef66f8bfc7.html",
