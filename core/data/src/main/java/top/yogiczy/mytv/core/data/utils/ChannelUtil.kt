@@ -282,7 +282,7 @@ object ChannelUtil {
                 "https://www.yb983.cn/cys/index.html",
             ),
             ChannelAlias.standardChannelName("农林卫视") to listOf(
-                "https://live.xnrtv.com/nl",
+                "http://live.xnrtv.com/nl",
             ),
             ChannelAlias.standardChannelName("康巴卫视") to listOf(
                 "https://www.kangbatv.com/zb_22587/",
@@ -336,6 +336,7 @@ object ChannelUtil {
             "sztv.com.cn",           
             "xnrtv.com",
             "kangbatv.com",
+            "yb983.cn",
             "xjtvs.com.cn"
         )
         
