@@ -156,8 +156,7 @@ object ChannelUtil {
                 "https://yangshipin.cn/tv/home?pid=600002521"
             ),
             ChannelAlias.standardChannelName("东方卫视") to listOf(
-                "https://live.kankanews.com/huikan/",
-                "https://yangshipin.cn/tv/home?pid=600002483",
+                 "https://yangshipin.cn/tv/home?pid=600002483",
                 "https://www.gdtv.cn/tvChannelDetail/43"
             ),
             ChannelAlias.standardChannelName("浙江卫视") to listOf(
@@ -221,7 +220,7 @@ object ChannelUtil {
                 "https://yangshipin.cn/tv/home?pid=600002493"
             ),
             ChannelAlias.standardChannelName("山东卫视") to listOf(
-                "https://v.iqilu.com/live/sdtv/index.html",
+                "https://v.iqilu.com/live/sdtv/",
                 "https://yangshipin.cn/tv/home?pid=600002513"
             ),
             ChannelAlias.standardChannelName("天津卫视") to listOf(
@@ -282,7 +281,7 @@ object ChannelUtil {
                 "https://www.yb983.cn/cys/index.html",
             ),
             ChannelAlias.standardChannelName("农林卫视") to listOf(
-                "http://live.xnrtv.com/nl",
+                "http://live.snrtv.com/nl",
             ),
             ChannelAlias.standardChannelName("康巴卫视") to listOf(
                 "https://www.kangbatv.com/zb_22587/",
@@ -296,25 +295,28 @@ object ChannelUtil {
              ChannelAlias.standardChannelName("哈哈炫动") to listOf(
                 "https://live.kankanews.com/huikan?id=9",
             ),
+             ChannelAlias.standardChannelName("优漫卡通") to listOf(
+                "https://live.jstv.com/?channelId=543",
+            ),
             ChannelAlias.standardChannelName("第一财经") to listOf(
                 "https://live.kankanews.com/huikan?id=5",
             ),
              ChannelAlias.standardChannelName("南昌新闻综合") to listOf(
                 "https://www.nctv.net.cn/live?channel=1",
             ),
-            ChannelAlias.standardChannelName("南昌文旅") to listOf(
+            ChannelAlias.standardChannelName("南昌都市") to listOf(
                 "https://www.nctv.net.cn/live?channel=2",
             ),ChannelAlias.standardChannelName("南昌资讯") to listOf(
                 "https://www.nctv.net.cn/live?channel=3",
             ),
-            ChannelAlias.standardChannelName("cetv-1") to listOf(
+            ChannelAlias.standardChannelName("cetv1") to listOf(
                 "https://yangshipin.cn/tv/home?pid=600171827",
                 "https://tv.gxtv.cn/channel/channelivePlay_ffa6b6e1b32b4a16a73eb3ef66f8bfc7.html",
             ),
-            ChannelAlias.standardChannelName("cetv-2") to listOf(
+            ChannelAlias.standardChannelName("cetv2") to listOf(
                 "https://tv.gxtv.cn/channel/channelivePlay_80d0ffb42c114eaf9663708629ff0a3e.html",
             ),
-            ChannelAlias.standardChannelName("cetv-4") to listOf(
+            ChannelAlias.standardChannelName("cetv4") to listOf(
                 "https://tv.gxtv.cn/channel/channelivePlay_67eace939278435bb4bca90800fb4225.html",
             ),
         )
@@ -354,9 +356,10 @@ object ChannelUtil {
             "qhbtv.com",
             "vtibet.cn",
             "sztv.com.cn",           
-            "xnrtv.com",
+            "snrtv.com",
             "kangbatv.com",
             "yb983.cn",
+            "sdetv.com.cn",
             "xjtvs.com.cn"
         )
         
