@@ -30,7 +30,8 @@ class TxtIptvParser : IptvParser {
                     val res = line.split(",", "，")
                     if (res.size < 2) return@forEach
 
-                    // 解析每一组URL（支持多个URL以#分隔）
+                    // 解析每一组URL（支持多个URL以#分隔，但排除webview://内的#）
+                    val pattern = Regex("(?<!webview://)#")
                     res[1].split("#").forEach { rawUrl ->
                         val trimmedUrl = rawUrl.trim()
                         val hybridType = if (trimmedUrl.startsWith("webview://")) {
