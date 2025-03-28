@@ -2,11 +2,14 @@ package top.yogiczy.mytv.core.data.repositories.iptv.parser
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import top.yogiczy.mytv.core.data.utils.Logger
 
 /**
  * txt直播源解析
  */
 class TxtIptvParser : IptvParser {
+
+    private val logger = Logger.create("TxtIptvParser")
 
     override fun isSupport(url: String, data: String): Boolean {
         return data.contains("#genre#")
@@ -27,13 +30,26 @@ class TxtIptvParser : IptvParser {
                     val res = line.split(",", "，")
                     if (res.size < 2) return@forEach
 
-                    channelList.addAll(res[1].split("#").map { url ->
-                        IptvParser.ChannelItem(
-                            name = res[0].trim(),
-                            groupName = groupName ?: "其他",
-                            url = url.trim(),
+                    // 解析每一组URL（支持多个URL以#分隔）
+                    res[1].split("#").forEach { rawUrl ->
+                        val trimmedUrl = rawUrl.trim()
+                        val hybridType = if (trimmedUrl.startsWith("webview://")) {
+                            logger.i("检测到WebView链接: $trimmedUrl")
+                            logger.i("将hybridType设置为WebView")
+                            IptvParser.ChannelItem.HybridType.WebView
+                        } else {
+                            null
+                        }
+
+                        channelList.addAll(
+                            IptvParser.ChannelItem(
+                                name = res[0].trim(),
+                                groupName = groupName ?: "其他",
+                                url = trimmedUrl,
+                                hybridType = hybridType // 设置混合类型
+                            )
                         )
-                    })
+                    }
                 }
             }
 
