@@ -34,21 +34,22 @@ class TxtIptvParser : IptvParser {
                     val urls = mutableListOf<String>()
                     val currentWebViewUrl = StringBuilder()
 
-                    // 手动处理#分割，确保webview://链接的完整性
-                    rawUrls.split("#").forEach { part ->
+                    // 关键修复：精确处理每个片段的分割与拼接
+                    rawUrls.split("#").forEachIndexed { index, part ->
+                        val trimmedPart = part.trim()
                         when {
                             // 检测到webview协议开头，开始拼接
-                            part.startsWith("webview://") -> {
+                            trimmedPart.startsWith("webview://") -> {
                                 currentWebViewUrl.clear()
-                                currentWebViewUrl.append(part)
+                                currentWebViewUrl.append(trimmedPart)
                             }
                             // 当前正在拼接webview链接，追加后续部分
                             currentWebViewUrl.isNotEmpty() -> {
-                                currentWebViewUrl.append("#").append(part)
+                                currentWebViewUrl.append("#").append(trimmedPart)
                             }
-                            // 普通URL直接添加
+                            // 普通URL直接添加（且非空）
                             else -> {
-                                if (part.isNotBlank()) urls.add(part)
+                                if (trimmedPart.isNotEmpty()) urls.add(trimmedPart)
                             }
                         }
                     }
@@ -65,7 +66,7 @@ class TxtIptvParser : IptvParser {
                             logger.i("检测到WebView链接: $trimmedUrl")
                             IptvParser.ChannelItem.HybridType.WebView
                         } else {
-                            IptvParser.ChannelItem.HybridType.None // 假设HybridType有None枚举
+                            IptvParser.ChannelItem.HybridType.None
                         }
 
                         channelList.add(
