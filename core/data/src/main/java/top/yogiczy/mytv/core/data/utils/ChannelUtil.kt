@@ -71,7 +71,7 @@ object ChannelUtil {
                 "https://tv.cctv.com/live/cctvchild/",
                 "https://yangshipin.cn/tv/home?pid=600001809",
             ),
-            ChannelAlias.standardChannelName("CCTV15 音乐") to listOf(
+            ChannelAlias.standardChannelName("CCTV-15 音乐") to listOf(
                 "https://tv.cctv.com/live/cctv15/",
                 "https://yangshipin.cn/tv/home?pid=600001815",
             ),
