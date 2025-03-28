@@ -30,43 +30,22 @@ class TxtIptvParser : IptvParser {
                     val res = line.split(",", "，")
                     if (res.size < 2) return@forEach
 
-                    val rawUrls = res[1]
-                    val urls = mutableListOf<String>()
-                    val currentWebViewUrl = StringBuilder()
+                    val name = res[0].trim()
+                    val rawUrls = res[1].trim()
 
-                    // 关键修复：使用迭代逻辑精确处理每个片段
-                    rawUrls.splitToSequence("#")
-                        .forEachIndexed { index, part ->
-                            val trimmedPart = part.trim()
-                            when {
-                                // 检测到webview协议开头，开始拼接
-                                trimmedPart.startsWith("webview://") -> {
-                                    currentWebViewUrl.clear()
-                                    currentWebViewUrl.append(trimmedPart)
-                                }
-                                // 当前正在拼接webview链接，追加后续部分
-                                currentWebViewUrl.isNotEmpty() -> {
-                                    currentWebViewUrl.append("#").append(trimmedPart)
-                                }
-                                // 普通URL直接添加（且非空）
-                                else -> {
-                                    if (trimmedPart.isNotEmpty()) {
-                                        urls.add(trimmedPart)
-                                    }
-                                }
-                            }
-                        }
-
-                    // 处理最后一个可能的webview链接
-                    if (currentWebViewUrl.isNotEmpty()) {
-                        urls.add(currentWebViewUrl.toString())
+                    // 关键逻辑：仅当不以webview://开头时，才用#分割
+                    val urls = if (rawUrls.startsWith("webview://")) {
+                        listOf(rawUrls) // WebView链接直接保留完整
+                    } else {
+                        rawUrls.split("#").map { it.trim() } // 其他链接按#分割
                     }
 
                     // 生成ChannelItem列表
-                    urls.forEach { rawUrl ->
-                        val trimmedUrl = rawUrl.trim()
-                        val hybridType = if (trimmedUrl.startsWith("webview://")) {
-                            logger.i("检测到WebView链接: $trimmedUrl")
+                    urls.forEach { url ->
+                        if (url.isBlank()) return@forEach
+
+                        val hybridType = if (url.startsWith("webview://")) {
+                            logger.i("检测到WebView链接: $url")
                             IptvParser.ChannelItem.HybridType.WebView
                         } else {
                             IptvParser.ChannelItem.HybridType.None
@@ -74,9 +53,9 @@ class TxtIptvParser : IptvParser {
 
                         channelList.add(
                             IptvParser.ChannelItem(
-                                name = res[0].trim(),
+                                name = name,
                                 groupName = groupName ?: "其他",
-                                url = trimmedUrl,
+                                url = url,
                                 hybridType = hybridType
                             )
                         )
