@@ -34,25 +34,28 @@ class TxtIptvParser : IptvParser {
                     val urls = mutableListOf<String>()
                     val currentWebViewUrl = StringBuilder()
 
-                    // 关键修复：精确处理每个片段的分割与拼接
-                    rawUrls.split("#").forEachIndexed { index, part ->
-                        val trimmedPart = part.trim()
-                        when {
-                            // 检测到webview协议开头，开始拼接
-                            trimmedPart.startsWith("webview://") -> {
-                                currentWebViewUrl.clear()
-                                currentWebViewUrl.append(trimmedPart)
-                            }
-                            // 当前正在拼接webview链接，追加后续部分
-                            currentWebViewUrl.isNotEmpty() -> {
-                                currentWebViewUrl.append("#").append(trimmedPart)
-                            }
-                            // 普通URL直接添加（且非空）
-                            else -> {
-                                if (trimmedPart.isNotEmpty()) urls.add(trimmedPart)
+                    // 关键修复：使用迭代逻辑精确处理每个片段
+                    rawUrls.splitToSequence("#")
+                        .forEachIndexed { index, part ->
+                            val trimmedPart = part.trim()
+                            when {
+                                // 检测到webview协议开头，开始拼接
+                                trimmedPart.startsWith("webview://") -> {
+                                    currentWebViewUrl.clear()
+                                    currentWebViewUrl.append(trimmedPart)
+                                }
+                                // 当前正在拼接webview链接，追加后续部分
+                                currentWebViewUrl.isNotEmpty() -> {
+                                    currentWebViewUrl.append("#").append(trimmedPart)
+                                }
+                                // 普通URL直接添加（且非空）
+                                else -> {
+                                    if (trimmedPart.isNotEmpty()) {
+                                        urls.add(trimmedPart)
+                                    }
+                                }
                             }
                         }
-                    }
 
                     // 处理最后一个可能的webview链接
                     if (currentWebViewUrl.isNotEmpty()) {
