@@ -38,15 +38,15 @@ class TxtIptvParser : IptvParser {
                             logger.i("将hybridType设置为WebView")
                             IptvParser.ChannelItem.HybridType.WebView
                         } else {
-                            null
+                            IptvParser.ChannelItem.HybridType.None // 假设存在默认值None
                         }
 
-                        channelList.addAll(
+                        channelList.add(
                             IptvParser.ChannelItem(
                                 name = res[0].trim(),
                                 groupName = groupName ?: "其他",
                                 url = trimmedUrl,
-                                hybridType = hybridType // 设置混合类型
+                                hybridType = hybridType // 确保非空
                             )
                         )
                     }
