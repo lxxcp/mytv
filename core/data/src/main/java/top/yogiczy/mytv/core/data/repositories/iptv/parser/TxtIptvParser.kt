@@ -30,16 +30,42 @@ class TxtIptvParser : IptvParser {
                     val res = line.split(",", "，")
                     if (res.size < 2) return@forEach
 
-                    // 解析每一组URL（支持多个URL以#分隔，但排除webview://内的#）
-                    val pattern = Regex("(?<!webview://)#")
-                    res[1].split("#").forEach { rawUrl ->
+                    val rawUrls = res[1]
+                    val urls = mutableListOf<String>()
+                    val currentWebViewUrl = StringBuilder()
+
+                    // 手动处理#分割，确保webview://链接的完整性
+                    rawUrls.split("#").forEach { part ->
+                        when {
+                            // 检测到webview协议开头，开始拼接
+                            part.startsWith("webview://") -> {
+                                currentWebViewUrl.clear()
+                                currentWebViewUrl.append(part)
+                            }
+                            // 当前正在拼接webview链接，追加后续部分
+                            currentWebViewUrl.isNotEmpty() -> {
+                                currentWebViewUrl.append("#").append(part)
+                            }
+                            // 普通URL直接添加
+                            else -> {
+                                if (part.isNotBlank()) urls.add(part)
+                            }
+                        }
+                    }
+
+                    // 处理最后一个可能的webview链接
+                    if (currentWebViewUrl.isNotEmpty()) {
+                        urls.add(currentWebViewUrl.toString())
+                    }
+
+                    // 生成ChannelItem列表
+                    urls.forEach { rawUrl ->
                         val trimmedUrl = rawUrl.trim()
                         val hybridType = if (trimmedUrl.startsWith("webview://")) {
                             logger.i("检测到WebView链接: $trimmedUrl")
-                            logger.i("将hybridType设置为WebView")
                             IptvParser.ChannelItem.HybridType.WebView
                         } else {
-                            IptvParser.ChannelItem.HybridType.None // 假设存在默认值None
+                            IptvParser.ChannelItem.HybridType.None // 假设HybridType有None枚举
                         }
 
                         channelList.add(
@@ -47,7 +73,7 @@ class TxtIptvParser : IptvParser {
                                 name = res[0].trim(),
                                 groupName = groupName ?: "其他",
                                 url = trimmedUrl,
-                                hybridType = hybridType // 确保非空
+                                hybridType = hybridType
                             )
                         )
                     }
