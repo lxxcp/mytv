@@ -164,8 +164,8 @@ sentry {
     projectName.set("mytv-android")
     authToken.set(getProperty("sentry.auth_token") ?: System.getenv("SENTRY_AUTH_TOKEN"))
     ignoredBuildTypes.set(setOf("debug"))
-    autoUploadProguardMapping = true // 改为 true
-    includeNativeSources = true       // 添加此配置以支持 Native 符号
+    autoUploadProguardMapping = false 
+   
 }
 
 fun getProperty(key: String): String? {
