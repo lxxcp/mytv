@@ -603,14 +603,11 @@ class Media3VideoPlayer(
                 .build()
             return
         }
-
-        if (track.language == null) {
-            track.language = "默认"
-        }
+       
         videoPlayer.trackSelectionParameters = videoPlayer.trackSelectionParameters
             .buildUpon()
             .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false)
-            .setPreferredTextLanguages(track.language?: "默认")
+            .setPreferredTextLanguages(track.language)
             .build()
     }
 
