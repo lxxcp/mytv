@@ -486,6 +486,11 @@ class Media3VideoPlayer(
 
             triggerMetadata(metadata)
         }
+		// Add the missing closing brace at the end of the class
+        override fun setVideoTextureView(textureView: TextureView) {
+            this.textureView = textureView
+            videoPlayer.setVideoTextureView(textureView)
+        }
     }
 
     private val eventLogger = EventLogger()
