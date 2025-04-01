@@ -96,9 +96,6 @@ class Media3VideoPlayer(
                 .build()
         }
 
-        // MediaCodecVideoRenderer.skipMultipleFramesOnSameVsync =
-        //     Configs.videoPlayerSkipMultipleFramesOnSameVSync
-
         return ExoPlayer.Builder(context)
             .setRenderersFactory(renderersFactory)
             .setTrackSelector(trackSelector)
@@ -130,7 +127,6 @@ class Media3VideoPlayer(
             "Referer" to (currentChannelLine.httpReferrer ?: "")
         ).filterValues { it.isNotEmpty() }
 
-        // 使用应用内日志系统
         logger.i("播放地址: ${currentChannelLine.playableUrl}")
         logger.i("请求头: $headers")
         logger.i("User-Agent: ${currentChannelLine.httpUserAgent ?: Configs.videoPlayerUserAgent}")
@@ -154,22 +150,18 @@ class Media3VideoPlayer(
 
         var contentTypeForce = contentType
 
-        if (uri.toString().startsWith("rtp://"))  || uri.toString().startsWith("rtsp://")) {
+        if (uri.toString().startsWith("rtp://") || uri.toString().startsWith("rtsp://")) {
             contentTypeForce = C.CONTENT_TYPE_RTSP
         }
 
-
-
-
-
-
         if (currentChannelLine.manifestType == "mpd") {
             contentTypeForce = C.CONTENT_TYPE_DASH
-
         }
-        if (uri.toString().startsWith("rtmp://")){
+
+        if (uri.toString().startsWith("rtmp://")) {
             contentTypeForce = C.CONTENT_TYPE_OTHER
         }
+
         val dataSourceFactory = getDataSourceFactory()
 
         return when (contentTypeForce ?: Util.inferContentType(uri)) {
@@ -180,34 +172,31 @@ class Media3VideoPlayer(
             C.CONTENT_TYPE_DASH -> {
                 DashMediaSource.Factory(dataSourceFactory)
                     .apply {
-                        if (!(currentChannelLine.manifestType == "mpd" && currentChannelLine.licenseType == "clearkey" && currentChannelLine.licenseKey != null))
-                            return@apply
-
-                        runCatching {
-                            val (drmKeyId, drmKey) = currentChannelLine.licenseKey!!.split(":")
-                            val encodedDrmKey = Base64.encodeToString(
-                                drmKey.chunked(2).map { it.toInt(16).toByte() }.toByteArray(),
-                                Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP
-                            )
-                            val encodedDrmKeyId = Base64.encodeToString(
-                                drmKeyId.chunked(2).map { it.toInt(16).toByte() }.toByteArray(),
-                                Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP
-                            )
-                            val drmBody =
-                                "{\"keys\":[{\"kty\":\"oct\",\"k\":\"${encodedDrmKey}\",\"kid\":\"${encodedDrmKeyId}\"}],\"type\":\"temporary\"}"
-
-                            val drmCallback = LocalMediaDrmCallback(drmBody.toByteArray())
-                            val drmSessionManager = DefaultDrmSessionManager.Builder()
-                                .setMultiSession(true)
-                                .setUuidAndExoMediaDrmProvider(
-                                    C.CLEARKEY_UUID,
-                                    FrameworkMediaDrm.DEFAULT_PROVIDER
+                        if (currentChannelLine.manifestType == "mpd" && currentChannelLine.licenseType == "clearkey" && currentChannelLine.licenseKey != null) {
+                            runCatching {
+                                val (drmKeyId, drmKey) = currentChannelLine.licenseKey!!.split(":")
+                                val encodedDrmKey = Base64.encodeToString(
+                                    drmKey.chunked(2).map { it.toInt(16).toByte() }.toByteArray(),
+                                    Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP
                                 )
-                                .build(drmCallback)
+                                val encodedDrmKeyId = Base64.encodeToString(
+                                    drmKeyId.chunked(2).map { it.toInt(16).toByte() }.toByteArray(),
+                                    Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP
+                                )
+                                val drmBody =
+                                    "{\"keys\":[{\"kty\":\"oct\",\"k\":\"${encodedDrmKey}\",\"kid\":\"${encodedDrmKeyId}\"}],\"type\":\"temporary\"}"
 
-                            setDrmSessionManagerProvider { drmSessionManager }
-                        }
-                            .onFailure {
+                                val drmCallback = LocalMediaDrmCallback(drmBody.toByteArray())
+                                val drmSessionManager = DefaultDrmSessionManager.Builder()
+                                    .setMultiSession(true)
+                                    .setUuidAndExoMediaDrmProvider(
+                                        C.CLEARKEY_UUID,
+                                        FrameworkMediaDrm.DEFAULT_PROVIDER
+                                    )
+                                    .build(drmCallback)
+
+                                setDrmSessionManagerProvider { drmSessionManager }
+                            }.onFailure {
                                 triggerError(
                                     PlaybackException(
                                         "MEDIA3_ERROR_DRM_LICENSE_EXPIRED",
@@ -215,6 +204,7 @@ class Media3VideoPlayer(
                                     )
                                 )
                             }
+                        }
                     }
                     .createMediaSource(mediaItem)
             }
@@ -228,18 +218,10 @@ class Media3VideoPlayer(
             C.CONTENT_TYPE_OTHER -> {
                 if (uri.toString().startsWith("rtmp://")) {
                     ProgressiveMediaSource.Factory(RtmpDataSource.Factory()).createMediaSource(mediaItem)
-                }else{
+                } else {
                     ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mediaItem)
                 }
-
-
-
-
-
             }
-
-
-
 
             else -> {
                 triggerError(PlaybackException.UNSUPPORTED_TYPE)
@@ -270,7 +252,6 @@ class Media3VideoPlayer(
 
         override fun onPlayerError(ex: androidx.media3.common.PlaybackException) {
             when (ex.errorCode) {
-                // 如果是直播加载位置错误，尝试重新播放
                 androidx.media3.common.PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW,
                 androidx.media3.common.PlaybackException.ERROR_CODE_DECODING_FAILED,
                 androidx.media3.common.PlaybackException.ERROR_CODE_IO_UNSPECIFIED -> {
@@ -278,7 +259,6 @@ class Media3VideoPlayer(
                     videoPlayer.prepare()
                 }
 
-                // 当解析容器不支持时，尝试使用其他解析容器
                 androidx.media3.common.PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED -> {
                     videoPlayer.currentMediaItem?.localConfiguration?.uri?.let {
                         if (contentTypeAttempts[C.CONTENT_TYPE_HLS] != true) {
@@ -287,13 +267,11 @@ class Media3VideoPlayer(
                             prepare(C.CONTENT_TYPE_DASH)
                         } else if (contentTypeAttempts[C.CONTENT_TYPE_RTSP] != true) {
                             prepare(C.CONTENT_TYPE_RTSP)
-						} else if(contentTypeAttempts[C.CONTENT_TYPE_SS] != true){
-                            prepare(C.CONTENT_TYPE_SS)	
+                        } else if (contentTypeAttempts[C.CONTENT_TYPE_SS] != true) {
+                            prepare(C.CONTENT_TYPE_SS)
                         } else if (contentTypeAttempts[C.CONTENT_TYPE_OTHER] != true) {
                             prepare(C.CONTENT_TYPE_OTHER)
                         } else {
-
-
                             triggerError(PlaybackException.UNSUPPORTED_TYPE)
                         }
                     }
@@ -441,7 +419,6 @@ class Media3VideoPlayer(
             height = height,
             color = colorInfo?.toLogString(),
             frameRate = frameRate,
-            // TODO 帧率、比特率目前是从tag中获取，有的返回空，后续需要实时计算
             bitrate = bitrate,
             mimeType = sampleMimeType,
         )
@@ -485,7 +462,6 @@ class Media3VideoPlayer(
             metadata = metadata.copy(
                 video = (metadata.video ?: Metadata.Video()).copy(decoder = decoderName)
             )
-
             triggerMetadata(metadata)
         }
 
@@ -499,138 +475,4 @@ class Media3VideoPlayer(
         }
 
         override fun onAudioDecoderInitialized(
-            eventTime: AnalyticsListener.EventTime,
-            decoderName: String,
-            initializedTimestampMs: Long,
-            initializationDurationMs: Long,
-        ) {
-            metadata = metadata.copy(
-                audio = (metadata.audio ?: Metadata.Audio()).copy(decoder = decoderName)
-            )
-
-            triggerMetadata(metadata)
-        }
-    }
-
-    private val eventLogger = EventLogger()
-
-    override fun initialize() {
-        super.initialize()
-        videoPlayer.addListener(playerListener)
-        videoPlayer.addAnalyticsListener(metadataListener)
-        videoPlayer.addAnalyticsListener(eventLogger)
-    }
-
-    override fun release() {
-        onCuesListeners.clear()
-        videoPlayer.removeListener(playerListener)
-        videoPlayer.removeAnalyticsListener(metadataListener)
-        videoPlayer.removeAnalyticsListener(eventLogger)
-        videoPlayer.stop()
-        videoPlayer.release()
-        super.release()
-    }
-
-    override fun prepare(line: ChannelLine) {
-        if (Configs.videoPlayerStopPreviousMediaItem)
-            videoPlayer.stop()
-
-        contentTypeAttempts.clear()
-        currentChannelLine = line
-        prepare(null)
-    }
-
-    override fun play() {
-        videoPlayer.play()
-    }
-
-    override fun pause() {
-        videoPlayer.pause()
-    }
-
-    override fun seekTo(position: Long) {
-        videoPlayer.seekTo(position)
-    }
-
-    override fun setVolume(volume: Float) {
-        videoPlayer.volume = volume
-    }
-
-    override fun getVolume(): Float {
-        return videoPlayer.volume
-    }
-
-    override fun stop() {
-        videoPlayer.stop()
-        updatePositionJob?.cancel()
-        super.stop()
-    }
-
-    override fun selectVideoTrack(track: Metadata.Video?) {
-        if (track?.index == null) {
-            videoPlayer.trackSelectionParameters = videoPlayer.trackSelectionParameters
-                .buildUpon()
-                .setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, true)
-                .build()
-
-            return
-        }
-
-        val (group, trackIndex) = track.index.fromIndexFindTrack(C.TRACK_TYPE_VIDEO)
-
-        videoPlayer.trackSelectionParameters = videoPlayer.trackSelectionParameters
-            .buildUpon()
-            .setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, false)
-            .setOverrideForType(TrackSelectionOverride(group, trackIndex))
-            .build()
-    }
-
-    override fun selectAudioTrack(track: Metadata.Audio?) {
-        if (track?.index == null) {
-            videoPlayer.trackSelectionParameters = videoPlayer.trackSelectionParameters
-                .buildUpon()
-                .setTrackTypeDisabled(C.TRACK_TYPE_AUDIO, true)
-                .build()
-
-            return
-        }
-
-        val (group, trackIndex) = track.index.fromIndexFindTrack(C.TRACK_TYPE_AUDIO)
-
-        videoPlayer.trackSelectionParameters = videoPlayer.trackSelectionParameters
-            .buildUpon()
-            .setTrackTypeDisabled(C.TRACK_TYPE_AUDIO, false)
-            .setOverrideForType(TrackSelectionOverride(group, trackIndex))
-            .build()
-    }
-
-    override fun selectSubtitleTrack(track: Metadata.Subtitle?) {
-        if (track?.language == null) {
-
-            videoPlayer.trackSelectionParameters = videoPlayer.trackSelectionParameters
-                .buildUpon()
-                .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
-                .build()
-
-            return
-        }
-
-
-
-
-        videoPlayer.trackSelectionParameters = videoPlayer.trackSelectionParameters
-            .buildUpon()
-            .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false)
-            .setPreferredTextLanguages(track.language)
-            .build()
-    }
-
-    override fun setVideoSurfaceView(surfaceView: SurfaceView) {
-        this.surfaceView = surfaceView
-        videoPlayer.setVideoSurfaceView(surfaceView)
-    }
-
-    override fun setVideoTextureView(textureView: TextureView) {
-        this.textureView = textureView
-        videoPlayer.setVideoTextureView(textureView)
-    }
+            eventTime: AnalyticsListener.Event
