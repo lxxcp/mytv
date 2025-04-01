@@ -475,7 +475,7 @@ class Media3VideoPlayer(
         }
 
         override fun onAudioDecoderInitialized(
-            eventTime: AnalyticsListener.Event
+            eventTime: AnalyticsListener.EventTime,
 			decoderName: String,
             initializedTimestampMs: Long,
             initializationDurationMs: Long,
