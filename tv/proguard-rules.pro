@@ -30,6 +30,6 @@
 -keep class com.wangsu.httpclient.** { *; }
 -keep class org.mozilla.javascript.** { *; }
 
-#-dontwarn java.awt.**
+-dontwarn java.awt.**
 -dontwarn java.beans.**
-#-dontwarn javax.swing.**
+-dontwarn javax.swing.**
