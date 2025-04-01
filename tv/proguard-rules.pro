@@ -23,8 +23,8 @@
 -keep class io.sentry.instrumentation.file.SentryFileReader { *; }
 
 #  移除 AWT/Swing 相关规则（Android 不支持）
-#-keep class java.awt.Rectangle { *; }
-#-keep class javax.swing.JInternalFrame { *; }
+-keep class java.awt.Rectangle { *; }
+-keep class javax.swing.JInternalFrame { *; }
 -keep class tv.danmaku.ijk.media.player.** { *; }
 -keep class com.aliyun.rts.network.** { *; }
 -keep class com.wangsu.httpclient.** { *; }
