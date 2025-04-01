@@ -476,3 +476,137 @@ class Media3VideoPlayer(
 
         override fun onAudioDecoderInitialized(
             eventTime: AnalyticsListener.Event
+			decoderName: String,
+            initializedTimestampMs: Long,
+            initializationDurationMs: Long,
+        ) {
+            metadata = metadata.copy(
+                audio = (metadata.audio ?: Metadata.Audio()).copy(decoder = decoderName)
+            )
+
+            triggerMetadata(metadata)
+        }
+    }
+
+    private val eventLogger = EventLogger()
+
+    override fun initialize() {
+        super.initialize()
+        videoPlayer.addListener(playerListener)
+        videoPlayer.addAnalyticsListener(metadataListener)
+        videoPlayer.addAnalyticsListener(eventLogger)
+    }
+
+    override fun release() {
+        onCuesListeners.clear()
+        videoPlayer.removeListener(playerListener)
+        videoPlayer.removeAnalyticsListener(metadataListener)
+        videoPlayer.removeAnalyticsListener(eventLogger)
+        videoPlayer.stop()
+        videoPlayer.release()
+        super.release()
+    }
+
+    override fun prepare(line: ChannelLine) {
+        if (Configs.videoPlayerStopPreviousMediaItem)
+            videoPlayer.stop()
+
+        contentTypeAttempts.clear()
+        currentChannelLine = line
+        prepare(null)
+    }
+
+    override fun play() {
+        videoPlayer.play()
+    }
+
+    override fun pause() {
+        videoPlayer.pause()
+    }
+
+    override fun seekTo(position: Long) {
+        videoPlayer.seekTo(position)
+    }
+
+    override fun setVolume(volume: Float) {
+        videoPlayer.volume = volume
+    }
+
+    override fun getVolume(): Float {
+        return videoPlayer.volume
+    }
+
+    override fun stop() {
+        videoPlayer.stop()
+        updatePositionJob?.cancel()
+        super.stop()
+    }
+
+    override fun selectVideoTrack(track: Metadata.Video?) {
+        if (track?.index == null) {
+            videoPlayer.trackSelectionParameters = videoPlayer.trackSelectionParameters
+                .buildUpon()
+                .setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, true)
+                .build()
+
+            return
+        }
+
+        val (group, trackIndex) = track.index.fromIndexFindTrack(C.TRACK_TYPE_VIDEO)
+
+        videoPlayer.trackSelectionParameters = videoPlayer.trackSelectionParameters
+            .buildUpon()
+            .setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, false)
+            .setOverrideForType(TrackSelectionOverride(group, trackIndex))
+            .build()
+    }
+
+    override fun selectAudioTrack(track: Metadata.Audio?) {
+        if (track?.index == null) {
+            videoPlayer.trackSelectionParameters = videoPlayer.trackSelectionParameters
+                .buildUpon()
+                .setTrackTypeDisabled(C.TRACK_TYPE_AUDIO, true)
+                .build()
+
+            return
+        }
+
+        val (group, trackIndex) = track.index.fromIndexFindTrack(C.TRACK_TYPE_AUDIO)
+
+        videoPlayer.trackSelectionParameters = videoPlayer.trackSelectionParameters
+            .buildUpon()
+            .setTrackTypeDisabled(C.TRACK_TYPE_AUDIO, false)
+            .setOverrideForType(TrackSelectionOverride(group, trackIndex))
+            .build()
+    }
+
+    override fun selectSubtitleTrack(track: Metadata.Subtitle?) {
+        if (track?.language == null) {
+
+            videoPlayer.trackSelectionParameters = videoPlayer.trackSelectionParameters
+                .buildUpon()
+                .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
+                .build()
+
+            return
+        }
+
+
+
+
+        videoPlayer.trackSelectionParameters = videoPlayer.trackSelectionParameters
+            .buildUpon()
+            .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false)
+            .setPreferredTextLanguages(track.language)
+            .build()
+    }
+
+    override fun setVideoSurfaceView(surfaceView: SurfaceView) {
+        this.surfaceView = surfaceView
+        videoPlayer.setVideoSurfaceView(surfaceView)
+    }
+
+    override fun setVideoTextureView(textureView: TextureView) {
+        this.textureView = textureView
+        videoPlayer.setVideoTextureView(textureView)
+    }
