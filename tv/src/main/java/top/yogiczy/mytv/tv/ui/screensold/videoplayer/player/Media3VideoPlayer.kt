@@ -129,12 +129,12 @@ class Media3VideoPlayer(
         val headers = Configs.videoPlayerHeaders.toHeaders() + mapOf(
             "Referer" to (currentChannelLine.httpReferrer ?: "")
         ).filterValues { it.isNotEmpty() }
-        
+
         // 使用应用内日志系统
         logger.i("播放地址: ${currentChannelLine.playableUrl}")
         logger.i("请求头: $headers")
         logger.i("User-Agent: ${currentChannelLine.httpUserAgent ?: Configs.videoPlayerUserAgent}")
-        
+
         return DefaultDataSource.Factory(
             context,
             DefaultHttpDataSource.Factory().apply {
@@ -154,20 +154,22 @@ class Media3VideoPlayer(
 
         var contentTypeForce = contentType
 
-        if (contentTypeForce == null){
-            if (uri.toString().startsWith("rtp://") || uri.toString().startsWith("rtsp://")) {
-                contentTypeForce = C.CONTENT_TYPE_RTSP
-            }
-
-            if (currentChannelLine.manifestType == "mpd") {
-                contentTypeForce = C.CONTENT_TYPE_DASH
-            }
-
-            if (uri.toString().startsWith("rtmp://")){
-                contentTypeForce = C.CONTENT_TYPE_OTHER
-            }
+        if (uri.toString().startsWith("rtp://"))  || uri.toString().startsWith("rtsp://")) {
+            contentTypeForce = C.CONTENT_TYPE_RTSP
         }
 
+
+
+
+
+
+        if (currentChannelLine.manifestType == "mpd") {
+            contentTypeForce = C.CONTENT_TYPE_DASH
+
+        }
+        if (uri.toString().startsWith("rtmp://")){
+            contentTypeForce = C.CONTENT_TYPE_OTHER
+        }
         val dataSourceFactory = getDataSourceFactory()
 
         return when (contentTypeForce ?: Util.inferContentType(uri)) {
@@ -220,19 +222,25 @@ class Media3VideoPlayer(
             C.CONTENT_TYPE_RTSP -> {
                 RtspMediaSource.Factory().createMediaSource(mediaItem)
             }
-
-            C.CONTENT_TYPE_OTHER -> {
-                if (uri.toString().startsWith("rtmp://")) {
-                    ProgressiveMediaSource.Factory(RtmpDataSource.Factory()).createMediaSource(mediaItem)
-                }
-                else{
-                    ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mediaItem)
-                }
-            }
-
             C.CONTENT_TYPE_SS -> {
                 SsMediaSource.Factory(dataSourceFactory).createMediaSource(mediaItem)
             }
+            C.CONTENT_TYPE_OTHER -> {
+                if (uri.toString().startsWith("rtmp://")) {
+                    ProgressiveMediaSource.Factory(RtmpDataSource.Factory()).createMediaSource(mediaItem)
+                }else{
+                    ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mediaItem)
+                }
+
+
+
+
+
+            }
+
+
+
+
             else -> {
                 triggerError(PlaybackException.UNSUPPORTED_TYPE)
                 null
@@ -279,11 +287,13 @@ class Media3VideoPlayer(
                             prepare(C.CONTENT_TYPE_DASH)
                         } else if (contentTypeAttempts[C.CONTENT_TYPE_RTSP] != true) {
                             prepare(C.CONTENT_TYPE_RTSP)
+						} else if(contentTypeAttempts[C.CONTENT_TYPE_SS] != true){
+                            prepare(C.CONTENT_TYPE_SS)	
                         } else if (contentTypeAttempts[C.CONTENT_TYPE_OTHER] != true) {
                             prepare(C.CONTENT_TYPE_OTHER)
-                        } else if(contentTypeAttempts[C.CONTENT_TYPE_SS] != true){
-                            prepare(C.CONTENT_TYPE_SS)
-                        }else {
+                        } else {
+
+
                             triggerError(PlaybackException.UNSUPPORTED_TYPE)
                         }
                     }
@@ -389,7 +399,7 @@ class Media3VideoPlayer(
                     List(group.mediaTrackGroup.length) { trackIndex ->
                         group.mediaTrackGroup
                             .getFormat(trackIndex)
-                            // .takeIf { it.roleFlags == C.ROLE_FLAG_SUBTITLE }
+                            .takeIf { it.roleFlags == C.ROLE_FLAG_SUBTITLE }
                             ?.toSubtitleMetadata()
                             ?.copy(isSelected = group.isTrackSelected(trackIndex))
                     }
@@ -593,17 +603,21 @@ class Media3VideoPlayer(
             .setOverrideForType(TrackSelectionOverride(group, trackIndex))
             .build()
     }
-    //或字幕语言属性${track?.language.toString()}
+
     override fun selectSubtitleTrack(track: Metadata.Subtitle?) {
-        if (track == null) {  
-            logger.i("字幕${track.toString()}为空，不予加载")
+        if (track?.language == null) {
+
             videoPlayer.trackSelectionParameters = videoPlayer.trackSelectionParameters
                 .buildUpon()
                 .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
                 .build()
+
             return
         }
-       
+
+
+
+
         videoPlayer.trackSelectionParameters = videoPlayer.trackSelectionParameters
             .buildUpon()
             .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false)
@@ -620,4 +634,3 @@ class Media3VideoPlayer(
         this.textureView = textureView
         videoPlayer.setVideoTextureView(textureView)
     }
-}
