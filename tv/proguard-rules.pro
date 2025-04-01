@@ -19,7 +19,12 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+# 保留Sentry instrumentation类
+-keep class io.sentry.instrumentation.file.SentryFileReader { *; }
 
+# 如果有使用反射需要保留的类
+-keep class java.awt.Rectangle { *; }
+-keep class javax.swing.JInternalFrame { *; }
 -keep class tv.danmaku.ijk.media.player.** { *; }
 -keep class com.aliyun.rts.network.** { *; }
 -keep class com.wangsu.httpclient.** { *; }
