@@ -611,3 +611,4 @@ class Media3VideoPlayer(
         this.textureView = textureView
         videoPlayer.setVideoTextureView(textureView)
     }
+} 
