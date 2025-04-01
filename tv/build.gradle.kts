@@ -132,14 +132,7 @@ dependencies {
     implementation(libs.androidx.media3.exoplayer.smoothstreaming)
     implementation("com.github.CarGuo.GSYVideoPlayer:gsyvideoplayer-java:v10.0.0")
     // implementation("com.github.CarGuo.GSYVideoPlayer:gsyvideoplayer-ex_so:v10.0.0")
-    // Sentry 版本升级
-    implementation("io.sentry:sentry-android:7.8.0")
-    // 排除可能的 AWT 依赖
-    implementation(libs.qrose) {
-        exclude(group = "java.desktop", module = "awt")
-    }
-    // 更新脱糖库
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+   
 
     // 二维码
     implementation(libs.qrose)
