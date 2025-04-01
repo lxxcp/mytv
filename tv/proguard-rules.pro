@@ -22,14 +22,14 @@
 # 保留Sentry instrumentation类
 -keep class io.sentry.instrumentation.file.SentryFileReader { *; }
 
-# 如果有使用反射需要保留的类
--keep class java.awt.Rectangle { *; }
--keep class javax.swing.JInternalFrame { *; }
+#  移除 AWT/Swing 相关规则（Android 不支持）
+#-keep class java.awt.Rectangle { *; }
+#-keep class javax.swing.JInternalFrame { *; }
 -keep class tv.danmaku.ijk.media.player.** { *; }
 -keep class com.aliyun.rts.network.** { *; }
 -keep class com.wangsu.httpclient.** { *; }
 -keep class org.mozilla.javascript.** { *; }
 
--dontwarn java.awt.**
+#-dontwarn java.awt.**
 -dontwarn java.beans.**
--dontwarn javax.swing.**
+#-dontwarn javax.swing.**
