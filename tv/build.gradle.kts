@@ -43,8 +43,7 @@ android {
             ndk {
                 abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a"))
             }
-            // 如果是库模块才需要此行，否则删除
-            consumerProguardFiles.add("proguard-rules.pro")
+          
         }
     }
 
