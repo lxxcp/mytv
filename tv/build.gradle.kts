@@ -128,6 +128,7 @@ dependencies {
         implementation(libs.androidx.media3.exoplayer.dash)
         implementation(libs.androidx.media3.ui)
     }
+    implementation(libs.androidx.media3.common)
     implementation(libs.androidx.media3.datasource.rtmp)
     implementation(libs.androidx.media3.exoplayer.smoothstreaming)
     implementation("com.github.CarGuo.GSYVideoPlayer:gsyvideoplayer-java:v10.0.0")
@@ -139,7 +140,7 @@ dependencies {
 
     implementation(libs.coil.compose)
     implementation(libs.coil.svg)
-
+    
     implementation(libs.okhttp)
     implementation(libs.androidasync)
 
