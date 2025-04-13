@@ -21,15 +21,15 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "天光云影"
+rootProject.name = "天光云影修改版"
 
 include(":core:data")
 include(":core:util")
 include(":core:designsystem")
 include(":tv")
-include(":mobile")
+//include(":mobile")
 include(":ijkplayer-java")
-include(":allinone")
+//include(":allinone")
 include(":gsyvideoplayer-ex_so")
 
 val mediaSettingsFile = file("../media/core_settings.gradle")
