@@ -860,7 +860,7 @@ object Configs {
         configs.cloudSyncWebDavUrl?.let { cloudSyncWebDavUrl = it }
         configs.cloudSyncWebDavUsername?.let { cloudSyncWebDavUsername = it }
         configs.cloudSyncWebDavPassword?.let { cloudSyncWebDavPassword = it }
-        configs.feiyangAllInOneFilePath?.let { feiyangAllInOneFilePath = it }
+          // configs.feiyangAllInOneFilePath?.let { feiyangAllInOneFilePath = it }
         configs.networkRetryCount?.let { networkRetryCount = it }
         configs.networkRetryInterval?.let { networkRetryInterval = it }
     }
@@ -933,7 +933,7 @@ object Configs {
         val cloudSyncWebDavUrl: String? = null,
         val cloudSyncWebDavUsername: String? = null,
         val cloudSyncWebDavPassword: String? = null,
-        val feiyangAllInOneFilePath: String? = null,
+           //val feiyangAllInOneFilePath: String? = null,
         val networkRetryCount: Long? = null,
         val networkRetryInterval: Long? = null,
     ) {
