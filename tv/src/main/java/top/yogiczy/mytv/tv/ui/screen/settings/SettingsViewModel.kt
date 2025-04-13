@@ -634,14 +634,14 @@ class SettingsViewModel : ViewModel() {
             Configs.cloudSyncWebDavPassword = value
         }
 
-    private var _feiyangAllInOneFilePath by mutableStateOf("")
-    var feiyangAllInOneFilePath: String
-        get() = _feiyangAllInOneFilePath
-        set(value) {
-            _feiyangAllInOneFilePath = value
-            Configs.feiyangAllInOneFilePath = value
-            afterSetWhenCloudSyncAutoPull()
-        }
+    // private var _feiyangAllInOneFilePath by mutableStateOf("")
+     //var feiyangAllInOneFilePath: String
+      //   get() = _feiyangAllInOneFilePath
+      //   set(value) {
+        //     _feiyangAllInOneFilePath = value
+        //     Configs.feiyangAllInOneFilePath = value
+        //     afterSetWhenCloudSyncAutoPull()
+       //  }
 
     private fun afterSetWhenCloudSyncAutoPull() {
         // if (_cloudSyncAutoPull) Snackbar.show("云同步：自动拉取已启用")
@@ -730,7 +730,7 @@ class SettingsViewModel : ViewModel() {
         _cloudSyncWebDavUrl = Configs.cloudSyncWebDavUrl
         _cloudSyncWebDavUsername = Configs.cloudSyncWebDavUsername
         _cloudSyncWebDavPassword = Configs.cloudSyncWebDavPassword
-        _feiyangAllInOneFilePath = Configs.feiyangAllInOneFilePath
+         //_feiyangAllInOneFilePath = Configs.feiyangAllInOneFilePath
     }
 
     companion object {
