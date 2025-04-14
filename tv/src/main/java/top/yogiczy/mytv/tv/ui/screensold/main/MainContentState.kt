@@ -369,10 +369,12 @@ class MainContentState(
             if(line.url.startsWith("rtsp://") && line.url.contains("smil") && (videoPlayerState.instance is Media3VideoPlayer)){
                 settingsViewModel.videoPlayerCore = Configs.VideoPlayerCore.IJK // Media3 1.6.0 不支持rtsp有效负载类型33
             }else{
+                 // 非RTSP时恢复默认核心（如Media3）
+                settingsViewModel.videoPlayerCore = Configs.VideoPlayerCore.MEDIA3 // 假设默认是MEDIA3
+                }
                 videoPlayerState.prepare(line)
             }
-            
-        }
+         }
     }
 
     fun changeCurrentChannelToPrev() {
