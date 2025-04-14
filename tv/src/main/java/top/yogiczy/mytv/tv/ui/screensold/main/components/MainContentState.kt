@@ -23,6 +23,8 @@ import top.yogiczy.mytv.core.data.entities.channel.ChannelGroupList.Companion.ch
 import top.yogiczy.mytv.core.data.entities.channel.ChannelLine
 import top.yogiczy.mytv.core.data.entities.channel.ChannelLineList
 import top.yogiczy.mytv.core.data.entities.channel.ChannelList
+import top.yogiczy.mytv.core.data.entities.iptvsource.IptvSource
+import top.yogiczy.mytv.core.data.entities.iptvsource.IptvSourceList
 import top.yogiczy.mytv.core.data.entities.epg.EpgProgramme
 import top.yogiczy.mytv.core.data.entities.epg.EpgProgrammeReserve
 import top.yogiczy.mytv.core.data.entities.epg.EpgProgrammeReserveList
@@ -30,11 +32,13 @@ import top.yogiczy.mytv.core.data.utils.ChannelUtil
 import top.yogiczy.mytv.core.data.utils.Constants
 import top.yogiczy.mytv.core.data.utils.Loggable
 import top.yogiczy.mytv.core.util.utils.urlHost
+import top.yogiczy.mytv.tv.ui.utils.Configs
 import top.yogiczy.mytv.tv.ui.material.Snackbar
 import top.yogiczy.mytv.tv.ui.screen.settings.SettingsViewModel
 import top.yogiczy.mytv.tv.ui.screen.settings.settingsVM
 import top.yogiczy.mytv.tv.ui.screensold.videoplayer.VideoPlayerState
 import top.yogiczy.mytv.tv.ui.screensold.videoplayer.player.VideoPlayer
+import top.yogiczy.mytv.tv.ui.screensold.videoplayer.player.Media3VideoPlayer
 import top.yogiczy.mytv.tv.ui.screensold.videoplayer.rememberVideoPlayerState
 import java.net.URI
 import java.text.SimpleDateFormat
@@ -57,7 +61,6 @@ class MainContentState(
     val currentChannelLineIdx get() = _currentChannelLineIdx
 
     val currentChannelLine get() = _currentChannel.lineList[_currentChannelLineIdx]
-
     private var _currentPlaybackEpgProgramme by mutableStateOf<EpgProgramme?>(null)
     val currentPlaybackEpgProgramme get() = _currentPlaybackEpgProgramme
 
@@ -82,6 +85,13 @@ class MainContentState(
         get() = _isVideoPlayerControllerScreenVisible
         set(value) {
             _isVideoPlayerControllerScreenVisible = value
+        }
+
+    private var _isIptvSourceScreenVisible by mutableStateOf(false)
+    var isIptvSourceScreenVisible
+        get() = _isIptvSourceScreenVisible
+        set(value) {
+            _isIptvSourceScreenVisible = value
         }
 
     private var _isQuickOpScreenVisible by mutableStateOf(false)
@@ -338,7 +348,11 @@ class MainContentState(
                 timeFormat.format(_currentPlaybackEpgProgramme!!.endAt),
             ).joinToString("")
             url = if (URI(url).query.isNullOrBlank()) "$url?$query" else "$url&$query"
+            if (Configs.iptvPLTVToTVOD)
+            {
             url = ChannelUtil.urlToCanPlayback(url)
+            }
+            
         }
         val line = currentChannelLine.copy(url = url)
 
@@ -352,7 +366,12 @@ class MainContentState(
         } else {
             log.i("检测到普通视频URL: ${line.url}")
             log.i("hybridType: ${line.hybridType}, 使用视频播放器播放")
-            videoPlayerState.prepare(line)
+            if(line.url.startsWith("rtsp://") && line.url.contains("smil") && (videoPlayerState.instance is Media3VideoPlayer)){
+                settingsViewModel.videoPlayerCore = Configs.VideoPlayerCore.IJK // Media3 1.6.0 不支持rtsp有效负载类型33
+            }else{
+                videoPlayerState.prepare(line)
+            }
+            
         }
     }
 
