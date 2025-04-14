@@ -23,8 +23,8 @@ import top.yogiczy.mytv.core.data.entities.channel.ChannelGroupList.Companion.ch
 import top.yogiczy.mytv.core.data.entities.channel.ChannelLine
 import top.yogiczy.mytv.core.data.entities.channel.ChannelLineList
 import top.yogiczy.mytv.core.data.entities.channel.ChannelList
-//import top.yogiczy.mytv.core.data.entities.iptvsource.IptvSource
-//import top.yogiczy.mytv.core.data.entities.iptvsource.IptvSourceList
+import top.yogiczy.mytv.core.data.entities.iptvsource.IptvSource
+import top.yogiczy.mytv.core.data.entities.iptvsource.IptvSourceList
 import top.yogiczy.mytv.core.data.entities.epg.EpgProgramme
 import top.yogiczy.mytv.core.data.entities.epg.EpgProgrammeReserve
 import top.yogiczy.mytv.core.data.entities.epg.EpgProgrammeReserveList
@@ -372,7 +372,8 @@ class MainContentState(
 
             // 仅在核心变化时切换
             if (settingsViewModel.videoPlayerCore != desiredCore) {
-                switchPlayerCore(desiredCore) // 包含异步销毁、初始化逻辑
+                 settingsViewModel.videoPlayerCore = desiredCore
+                 videoPlayerState.reinitializePlayer() // 需实现播放器重初始化逻辑
             } else {
                 videoPlayerState.prepare(line)
             }
