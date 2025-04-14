@@ -10,7 +10,7 @@
 
 5.m3u播放源支持Referer请求头参数http-referer=""；
 
-6.m3u文件支持混合使用webview://http://xxxx；
+6.源文件支持混合使用webview://http://xxxx；
 
 7.优化WebView植入JS脚本逻辑，提高获取效率，修复部分网址不全屏；
 
