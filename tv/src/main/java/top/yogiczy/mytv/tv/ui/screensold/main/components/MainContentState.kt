@@ -359,9 +359,8 @@ class MainContentState(
 			if (line.url.startsWith("rtsp://") && line.url.contains("smil") && (videoPlayerState.instance is Media3VideoPlayer)) {
                settingsViewModel.videoPlayerCore = Configs.VideoPlayerCore.IJK
             } else {
-               settingsViewModel.videoPlayerCore = Configs.VideoPlayerCore.MEDIA3 // 恢复默认
-            }
-            videoPlayerState.prepare(line)
+               videoPlayerState.prepare(line)
+	   } 
         }
     }
 
