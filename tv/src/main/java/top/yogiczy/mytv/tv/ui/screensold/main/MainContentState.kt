@@ -87,13 +87,7 @@ class MainContentState(
             _isVideoPlayerControllerScreenVisible = value
         }
 
-    private var _isIptvSourceScreenVisible by mutableStateOf(false)
-    var isIptvSourceScreenVisible
-        get() = _isIptvSourceScreenVisible
-        set(value) {
-            _isIptvSourceScreenVisible = value
-        }
-
+  
     private var _isQuickOpScreenVisible by mutableStateOf(false)
     var isQuickOpScreenVisible
         get() = _isQuickOpScreenVisible
@@ -348,10 +342,8 @@ class MainContentState(
                 timeFormat.format(_currentPlaybackEpgProgramme!!.endAt),
             ).joinToString("")
             url = if (URI(url).query.isNullOrBlank()) "$url?$query" else "$url&$query"
-            if (Configs.iptvPLTVToTVOD)
-            {
+            
             url = ChannelUtil.urlToCanPlayback(url)
-            }
             
         }
         val line = currentChannelLine.copy(url = url)
