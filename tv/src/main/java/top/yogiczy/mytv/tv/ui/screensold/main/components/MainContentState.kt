@@ -23,8 +23,8 @@ import top.yogiczy.mytv.core.data.entities.channel.ChannelGroupList.Companion.ch
 import top.yogiczy.mytv.core.data.entities.channel.ChannelLine
 import top.yogiczy.mytv.core.data.entities.channel.ChannelLineList
 import top.yogiczy.mytv.core.data.entities.channel.ChannelList
-import top.yogiczy.mytv.core.data.entities.iptvsource.IptvSource
-import top.yogiczy.mytv.core.data.entities.iptvsource.IptvSourceList
+//import top.yogiczy.mytv.core.data.entities.iptvsource.IptvSource
+//import top.yogiczy.mytv.core.data.entities.iptvsource.IptvSourceList
 import top.yogiczy.mytv.core.data.entities.epg.EpgProgramme
 import top.yogiczy.mytv.core.data.entities.epg.EpgProgrammeReserve
 import top.yogiczy.mytv.core.data.entities.epg.EpgProgrammeReserveList
@@ -32,7 +32,7 @@ import top.yogiczy.mytv.core.data.utils.ChannelUtil
 import top.yogiczy.mytv.core.data.utils.Constants
 import top.yogiczy.mytv.core.data.utils.Loggable
 import top.yogiczy.mytv.core.util.utils.urlHost
-import top.yogiczy.mytv.tv.ui.utils.Configs
+//import top.yogiczy.mytv.tv.ui.utils.Configs
 import top.yogiczy.mytv.tv.ui.material.Snackbar
 import top.yogiczy.mytv.tv.ui.screen.settings.SettingsViewModel
 import top.yogiczy.mytv.tv.ui.screen.settings.settingsVM
@@ -348,11 +348,9 @@ class MainContentState(
                 timeFormat.format(_currentPlaybackEpgProgramme!!.endAt),
             ).joinToString("")
             url = if (URI(url).query.isNullOrBlank()) "$url?$query" else "$url&$query"
-            if (Configs.iptvPLTVToTVOD)
-            {
+           
             url = ChannelUtil.urlToCanPlayback(url)
-            }
-            
+                       
         }
         val line = currentChannelLine.copy(url = url)
 
