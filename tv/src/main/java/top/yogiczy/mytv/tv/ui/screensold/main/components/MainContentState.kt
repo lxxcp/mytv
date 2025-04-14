@@ -367,6 +367,8 @@ class MainContentState(
             if(line.url.startsWith("rtsp://") && line.url.contains("smil") && (videoPlayerState.instance is Media3VideoPlayer)){
                 settingsViewModel.videoPlayerCore = Configs.VideoPlayerCore.IJK // Media3 1.6.0 不支持rtsp有效负载类型33
             }else{
+                // 显式设置回Media3确保后续使用正确核心
+                settingsViewModel.videoPlayerCore = Configs.VideoPlayerCore.MEDIA3
                 videoPlayerState.prepare(line)
             }
             
