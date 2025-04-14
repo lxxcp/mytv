@@ -87,7 +87,14 @@ class MainContentState(
         set(value) {
             _isVideoPlayerControllerScreenVisible = value
         }
-
+    private var _isIptvSourceScreenVisible by mutableStateOf(false)
+     var isIptvSourceScreenVisible
+         get() = _isIptvSourceScreenVisible
+         set(value) {
+             _isIptvSourceScreenVisible = value
+         }
+ 
+ 
     private var _isQuickOpScreenVisible by mutableStateOf(false)
     var isQuickOpScreenVisible
         get() = _isQuickOpScreenVisible
