@@ -61,6 +61,7 @@ class MainContentState(
     val currentChannelLineIdx get() = _currentChannelLineIdx
 
     val currentChannelLine get() = _currentChannel.lineList[_currentChannelLineIdx]
+
     private var _currentPlaybackEpgProgramme by mutableStateOf<EpgProgramme?>(null)
     val currentPlaybackEpgProgramme get() = _currentPlaybackEpgProgramme
 
@@ -87,7 +88,6 @@ class MainContentState(
             _isVideoPlayerControllerScreenVisible = value
         }
 
-  
     private var _isQuickOpScreenVisible by mutableStateOf(false)
     var isQuickOpScreenVisible
         get() = _isQuickOpScreenVisible
@@ -342,9 +342,7 @@ class MainContentState(
                 timeFormat.format(_currentPlaybackEpgProgramme!!.endAt),
             ).joinToString("")
             url = if (URI(url).query.isNullOrBlank()) "$url?$query" else "$url&$query"
-            
             url = ChannelUtil.urlToCanPlayback(url)
-            
         }
         val line = currentChannelLine.copy(url = url)
 
@@ -358,15 +356,13 @@ class MainContentState(
         } else {
             log.i("检测到普通视频URL: ${line.url}")
             log.i("hybridType: ${line.hybridType}, 使用视频播放器播放")
-            if(line.url.startsWith("rtsp://") && line.url.contains("smil") && (videoPlayerState.instance is Media3VideoPlayer)){
-                settingsViewModel.videoPlayerCore = Configs.VideoPlayerCore.IJK // Media3 1.6.0 不支持rtsp有效负载类型33
-            }else{
-                 // 非RTSP时恢复默认核心（如Media3）
-                settingsViewModel.videoPlayerCore = Configs.VideoPlayerCore.MEDIA3 // 假设默认是MEDIA3
-                }
-                videoPlayerState.prepare(line)
+			if (line.url.startsWith("rtsp://") && line.url.contains("smil") && (videoPlayerState.instance is Media3VideoPlayer)) {
+               settingsViewModel.videoPlayerCore = Configs.VideoPlayerCore.IJK
+            } else {
+               settingsViewModel.videoPlayerCore = Configs.VideoPlayerCore.MEDIA3 // 恢复默认
             }
-         }
+            videoPlayerState.prepare(line)
+        }
     }
 
     fun changeCurrentChannelToPrev() {
