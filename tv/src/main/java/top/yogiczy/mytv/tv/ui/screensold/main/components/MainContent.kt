@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
+import top.yogiczy.mytv.core.data.utils.Constants
 import top.yogiczy.mytv.core.data.entities.channel.Channel
 import top.yogiczy.mytv.core.data.entities.channel.ChannelGroupList
 import top.yogiczy.mytv.core.data.entities.channel.ChannelGroupList.Companion.channelList
@@ -57,6 +58,8 @@ fun MainContent(
     settingsViewModel: SettingsViewModel = settingsVM,
     onChannelFavoriteToggle: (Channel) -> Unit = {},
     toSettingsScreen: (SettingsSubCategories?) -> Unit = {},
+    toDashboardScreen: () -> Unit = {},
+    onReload: () -> Unit = {},
     onBackPressed: () -> Unit = {},
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -395,6 +398,10 @@ fun MainContent(
             toSettingsScreen = {
                 mainContentState.isQuickOpScreenVisible = false
                 toSettingsScreen(it)
+            },
+            toDashboardScreen = {
+                mainContentState.isQuickOpScreenVisible = false
+                toDashboardScreen()
             },
             onClearCache = {
                 settingsViewModel.iptvChannelLinePlayableHostList = emptySet()
