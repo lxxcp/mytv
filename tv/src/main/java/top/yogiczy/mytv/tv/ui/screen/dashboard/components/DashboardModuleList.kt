@@ -111,7 +111,7 @@ fun DashboardModuleList(
             )
         }
 
-        /*item {
+        item {
             DashboardModuleItem(
                 modifier = Modifier
                     .focusRequester(runtime.lastItemFocusRequester)
@@ -120,7 +120,7 @@ fun DashboardModuleList(
                 title = "关于",
                 onSelected = toAboutScreen,
             )
-        }*/
+        }
     }
 }
 
