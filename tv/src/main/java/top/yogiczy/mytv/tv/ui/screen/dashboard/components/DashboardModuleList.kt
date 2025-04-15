@@ -87,21 +87,21 @@ fun DashboardModuleList(
             )
         }
 
-        /*item {
+        item {
             DashboardModuleItem(
                 imageVector = Icons.Outlined.InsertChart,
                 title = "观看统计",
                 tag = "UNDO",
             )
-        }*/
+        }
 
-        /*item {
+        item {
             DashboardModuleItem(
                 imageVector = Icons.Outlined.CloudUpload,
                 title = "推送",
                 onSelected = toPushScreen,
             )
-        }*/
+        }
 
         item {
             DashboardModuleItem(
