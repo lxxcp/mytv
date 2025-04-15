@@ -424,8 +424,9 @@ fun rememberMainContentState(
     settingsViewModel: SettingsViewModel = settingsVM,
 ): MainContentState {
     val favoriteChannelListProviderUpdated by rememberUpdatedState(favoriteChannelListProvider)
-  
-    return remember(settingsVM.videoPlayerCore) {
+   val currentPlayerCore by rememberUpdatedState(settingsViewModel.videoPlayerCore)
+    
+    return remember(currentPlayerCore) { // 修改依赖项
         MainContentState(
             coroutineScope = coroutineScope,
             videoPlayerState = videoPlayerState,
