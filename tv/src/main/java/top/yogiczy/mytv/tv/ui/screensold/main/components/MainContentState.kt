@@ -372,7 +372,7 @@ class MainContentState(
 	    
 	    videoPlayerState.prepare(line)
 	   } 
-        }
+       
     }
 
     fun changeCurrentChannelToPrev() {
