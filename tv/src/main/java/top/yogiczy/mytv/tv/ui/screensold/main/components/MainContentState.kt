@@ -352,13 +352,7 @@ class MainContentState(
             url = ChannelUtil.urlToCanPlayback(url)
         }
         val line = currentChannelLine.copy(url = url)
-        if (line.url.startsWith("rtsp://") && line.url.contains("smil") && (videoPlayerState.instance is Media3VideoPlayer)) {
-            settingsViewModel.videoPlayerCore = Configs.VideoPlayerCore.IJK
-        } else {
-            // 新增：非RTSP时恢复默认播放器核心
-            settingsViewModel.videoPlayerCore = Configs.VideoPlayerCore.MEDIA3
-        }
-        videoPlayerState.prepare(line) // 此调用应放在条件分支外
+
         log.d("播放${_currentChannel.name}（${_currentChannelLineIdx + 1}/${_currentChannel.lineList.size}）: $line")
 
         if (line.hybridType == ChannelLine.HybridType.WebView) {
@@ -369,10 +363,12 @@ class MainContentState(
         } else {
             log.i("检测到普通视频URL: ${line.url}")
             log.i("hybridType: ${line.hybridType}, 使用视频播放器播放")
-	    
-	    videoPlayerState.prepare(line)
+			if (line.url.startsWith("rtsp://") && line.url.contains("smil") && (videoPlayerState.instance is Media3VideoPlayer)) {
+               settingsViewModel.videoPlayerCore = Configs.VideoPlayerCore.IJK
+            } else {
+               videoPlayerState.prepare(line)
 	   } 
-       
+        }
     }
 
     fun changeCurrentChannelToPrev() {
@@ -424,9 +420,8 @@ fun rememberMainContentState(
     settingsViewModel: SettingsViewModel = settingsVM,
 ): MainContentState {
     val favoriteChannelListProviderUpdated by rememberUpdatedState(favoriteChannelListProvider)
-    val currentPlayerCore by rememberUpdatedState(settingsViewModel.videoPlayerCore)
-    
-    return remember(currentPlayerCore) { // 修改依赖项
+
+    return remember(settingsVM.videoPlayerCore) {
         MainContentState(
             coroutineScope = coroutineScope,
             videoPlayerState = videoPlayerState,
