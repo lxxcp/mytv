@@ -133,6 +133,6 @@ private fun DashboardModuleListPreview() {
                 modifier = Modifier.padding(vertical = 20.dp),
             )
         }
-        // PreviewWithLayoutGrids { }
+        PreviewWithLayoutGrids { }
     }
 }
