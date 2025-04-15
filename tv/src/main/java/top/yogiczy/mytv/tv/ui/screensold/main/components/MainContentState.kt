@@ -363,10 +363,13 @@ class MainContentState(
         } else {
             log.i("检测到普通视频URL: ${line.url}")
             log.i("hybridType: ${line.hybridType}, 使用视频播放器播放")
-			if (line.url.startsWith("rtsp://") && line.url.contains("smil") && (videoPlayerState.instance is Media3VideoPlayer)) {
+	    if (line.url.startsWith("rtsp://") && line.url.contains("smil") && (videoPlayerState.instance is Media3VideoPlayer)) {
                settingsViewModel.videoPlayerCore = Configs.VideoPlayerCore.IJK
             } else {
-               videoPlayerState.prepare(line)
+                 // 新增：非RTSP时恢复默认播放器核心
+               settingsViewModel.videoPlayerCore = Configs.VideoPlayerCore.MEDIA3
+            }
+	    videoPlayerState.prepare(line)
 	   } 
         }
     }
