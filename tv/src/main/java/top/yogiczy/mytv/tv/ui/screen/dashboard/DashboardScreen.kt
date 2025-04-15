@@ -172,6 +172,6 @@ private fun DashboardScreenScreen() {
             channelFavoriteListProvider = { ChannelFavoriteList.EXAMPLE },
             epgListProvider = { EpgList.example(ChannelList.EXAMPLE) },
         )
-        // PreviewWithLayoutGrids { }
+        PreviewWithLayoutGrids { }
     }
 }
