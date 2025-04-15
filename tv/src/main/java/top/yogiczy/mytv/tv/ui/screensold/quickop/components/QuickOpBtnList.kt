@@ -31,6 +31,7 @@ fun QuickOpBtnList(
     onShowAudioTracks: () -> Unit = {},
     onShowSubtitleTracks: () -> Unit = {},
     onShowMoreSettings: () -> Unit = {},
+    onShowDashboardScreen: () -> Unit = {},
     onClearCache: () -> Unit = {},
     onUserAction: () -> Unit = {},
 ) {
@@ -123,6 +124,12 @@ fun QuickOpBtnList(
             QuickOpBtn(
                 title = { Text("清除缓存") },
                 onSelect = onClearCache,
+            )
+        }
+        item {
+            QuickOpBtn(
+                title = { Text("其它") },
+                onSelect = onShowDashboardScreen,
             )
         }
         item {
