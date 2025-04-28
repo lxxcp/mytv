@@ -1,181 +1,186 @@
 const ___startTime = Date.now();
 
-// 增强的视频检测功能，支持Shadow DOM和常见播放器
-function findVideoElement() {
-    // 1. 查找标准video元素
-    let video = document.querySelector('video');
-    if (video) return video;
-    
-    // 2. 查找Shadow DOM中的video
-    const getAllShadowRoots = () => {
-        const roots = [];
-        const walker = (node) => {
-            if (node.shadowRoot) {
-                roots.push(node.shadowRoot);
-                Array.from(node.shadowRoot.children).forEach(walker);
+// 增强的视频检测功能
+function findActiveVideoElement() {
+    // 1. 优先查找可见的video元素
+    const videos = Array.from(document.querySelectorAll('video')).filter(v => {
+        const rect = v.getBoundingClientRect();
+        return rect.width > 10 && rect.height > 10 && window.getComputedStyle(v).display !== 'none';
+    });
+
+    // 优先返回正在播放的视频
+    const playingVideo = videos.find(v => !v.paused);
+    if (playingVideo) return playingVideo;
+    if (videos.length > 0) return videos[0];
+
+    // 2. 检查Shadow DOM
+    const walkShadowRoots = (root) => {
+        const v = root.querySelector('video');
+        if (v) return v;
+        for (const el of root.querySelectorAll('*')) {
+            if (el.shadowRoot) {
+                const result = walkShadowRoots(el.shadowRoot);
+                if (result) return result;
             }
-        };
-        Array.from(document.querySelectorAll('*')).forEach(walker);
-        return roots;
+        }
+        return null;
     };
     
-    for (const root of getAllShadowRoots()) {
-        video = root.querySelector('video');
-        if (video) return video;
-    }
-    
-    // 3. 查找常见播放器容器中的video
+    const shadowVideo = walkShadowRoots(document);
+    if (shadowVideo) return shadowVideo;
+
+    // 3. 检查常见播放器容器
     const playerContainers = [
         '.prism-player', '.xgplayer', '.dplayer',
-        '.video-js', '.jw-player', '.flowplayer'
+        '.video-js', '.jw-wrapper', '.flowplayer'
     ];
     
     for (const selector of playerContainers) {
         const container = document.querySelector(selector);
         if (container) {
-            video = container.querySelector('video');
+            const video = container.querySelector('video');
             if (video) return video;
         }
     }
-    
+
     return null;
 }
 
-// 更安全的控制栏移除功能
-function removePlayerControls() {
-    const selectors = [
-        // 原有选择器
-        '#control_bar_player', '#pic_in_pic_player', '.con.poster',
-        'xg-controls', '.xgplayer-controls', '[data-kp-role=bottom-controls]',
-        '.prism-controlbar', '.vjs-control-bar', '.playback-layer',
-        '.control-bar', '.bitrate-layer', '.volume-layer',
-        '.dplayer-controller', '._tdp_contrl',
-        
-        // 新增选择器
-        '.ad-container', '.ad-banner', '.banner-ad',
-        '.popup', '.modal', '.login-dialog'
-    ];
+// 最小化页面清理
+function prepareBasicPage() {
+    // 仅移除最明显的控制栏
+    const controls = [
+        '.vjs-control-bar',
+        '.xgplayer-controls',
+        '.prism-controlbar',
+        '.dplayer-controller'
+    ].join(',');
     
-    selectors.forEach(selector => {
-        try {
-            document.querySelectorAll(selector).forEach(el => el.remove());
-        } catch (e) {
-            console.log('移除元素失败:', selector, e);
-        }
-    });
+    document.querySelectorAll(controls).forEach(el => el.remove());
+    
+    // 设置基本全屏样式
+    document.body.style.cssText = `
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #000 !important;
+        overflow: hidden !important;
+    `;
 }
 
-// 优化全屏显示功能
-function setupFullscreenVideo(video) {
-    if (!video) return;
-    
+// 安全设置视频全屏
+function setupVideoDisplay(video) {
+    if (!video) return false;
+
     // 备份原始状态
     const originalParent = video.parentNode;
     const originalStyle = video.getAttribute('style');
     
-    // 创建全屏容器
-    const container = document.createElement('div');
-    container.style.cssText = `
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-        background: #000 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        z-index: 9999 !important;
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-    `;
-    
-    // 设置视频样式
-    video.style.cssText = `
-        max-width: 100% !important;
-        max-height: 100% !important;
-        object-fit: contain !important;
-    `;
-    
-    // 添加到DOM
-    container.appendChild(video);
-    document.body.innerHTML = '';
-    document.body.appendChild(container);
-    
-    // 确保播放
-    const ensurePlayback = () => {
-        if (video.paused) {
-            video.play().catch(e => {
-                console.log('播放失败，尝试静音播放:', e);
-                video.muted = true;
-                video.play().catch(e => console.log('静音播放失败:', e));
-            });
+    try {
+        // 创建简单的全屏容器
+        const container = document.createElement('div');
+        container.style.cssText = `
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: #000 !important;
+            z-index: 9999 !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+        `;
+
+        // 设置视频基本样式
+        video.style.cssText = `
+            max-width: 100% !important;
+            max-height: 100% !important;
+            object-fit: contain !important;
+        `;
+
+        // 添加到DOM
+        container.appendChild(video);
+        document.body.innerHTML = '';
+        document.body.appendChild(container);
+
+        // 确保播放
+        video.muted = false;
+        video.volume = 1;
+        video.autoplay = true;
+        video.playsInline = true;
+        
+        const playPromise = video.play().catch(e => {
+            console.log('播放失败，尝试静音播放:', e);
+            video.muted = true;
+            return video.play();
+        });
+
+        // 更新分辨率
+        Android.changeVideoResolution(
+            video.videoWidth || 1280, 
+            video.videoHeight || 720
+        );
+
+        return true;
+    } catch (e) {
+        console.error('全屏设置失败:', e);
+        // 恢复原始状态
+        if (originalParent) {
+            video.style.cssText = originalStyle || '';
+            originalParent.appendChild(video);
         }
-    };
-    
-    video.addEventListener('loadedmetadata', ensurePlayback);
-    video.addEventListener('canplay', ensurePlayback);
-    
-    // 更新分辨率
-    Android.changeVideoResolution(
-        video.videoWidth || 1920, 
-        video.videoHeight || 1080
-    );
-    
-    // 返回恢复函数
-    return () => {
-        container.removeChild(video);
-        originalParent.appendChild(video);
-        if (originalStyle) {
-            video.setAttribute('style', originalStyle);
-        } else {
-            video.removeAttribute('style');
-        }
-    };
+        return false;
+    }
 }
 
 // 主初始化函数
 function __initializeMain() {
     // 超时处理
-    if (Date.now() - ___startTime > 15000) {
+    if (Date.now() - ___startTime > 10000) { // 缩短为10秒超时
         clearInterval(my_pollingIntervalId);
         Android.updatePlaceholderVisible(true, '加载超时');
         return;
     }
+
+    // 最小化页面准备
+    prepareBasicPage();
     
-    const video = findVideoElement();
-    console.log('找到的视频元素:', video);
+    // 查找视频元素
+    const video = findActiveVideoElement();
+    console.log('当前视频元素状态:', video);
     
-    if (video && video.src) {
-        console.log('视频源:', video.src);
-        
-        // 确保音量设置
-        video.muted = false;
-        video.volume = 1;
-        video.autoplay = true;
-        
-        // 如果有画面则设置全屏
-        if (video.videoWidth > 0 && video.videoHeight > 0) {
-            removePlayerControls();
-            setupFullscreenVideo(video);
+    if (video) {
+        console.log('视频信息:', {
+            src: video.src,
+            readyState: video.readyState,
+            videoWidth: video.videoWidth,
+            videoHeight: video.videoHeight,
+            paused: video.paused
+        });
+
+        // 尝试设置全屏
+        if (setupVideoDisplay(video)) {
             clearInterval(my_pollingIntervalId);
             Android.updatePlaceholderVisible(false, '');
-        } else {
-            // 如果还没有画面，等待metadata加载
-            video.addEventListener('loadedmetadata', () => {
-                if (video.videoWidth > 0 && video.videoHeight > 0) {
-                    removePlayerControls();
-                    setupFullscreenVideo(video);
-                    clearInterval(my_pollingIntervalId);
-                    Android.updatePlaceholderVisible(false, '');
-                }
-            }, { once: true });
+            return;
         }
+    }
+    
+    // 如果视频存在但还没准备好，监听准备事件
+    if (video && video.readyState < 3) {
+        const onReady = () => {
+            if (setupVideoDisplay(video)) {
+                clearInterval(my_pollingIntervalId);
+                Android.updatePlaceholderVisible(false, '');
+                video.removeEventListener('canplay', onReady);
+            }
+        };
+        video.addEventListener('canplay', onReady, { once: true });
     }
 }
 
 // 启动轮询
-const my_pollingIntervalId = setInterval(__initializeMain, 500);
+const my_pollingIntervalId = setInterval(__initializeMain, 800); // 调整为800ms
 
-// 初始执行一次
+// 初始执行
 __initializeMain();
