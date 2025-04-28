@@ -1,156 +1,140 @@
 const ___startTime = Date.now();
 
-// 安全获取视频元素，避免过度清理
-function findMainVideoElement() {
-    // 1. 优先查找主文档中的可见video元素
-    const videos = Array.from(document.querySelectorAll('video')).filter(v => {
-        const rect = v.getBoundingClientRect();
-        return rect.width > 100 && rect.height > 100 && getComputedStyle(v).visibility !== 'hidden';
-    });
-
-    if (videos.length > 0) {
-        // 优先返回正在播放的视频
-        const playingVideo = videos.find(v => !v.paused);
-        return playingVideo || videos[0];
-    }
-
-    // 2. 检查常见播放器容器
-    const playerContainers = [
-        '.prism-player', '.xgplayer', '.dplayer',
-        '.video-js', '.jw-wrapper', '.flowplayer'
-    ].flatMap(selector => 
-        Array.from(document.querySelectorAll(selector))
-        .filter(el => el.offsetWidth > 100)
-    );
-
-    for (const container of playerContainers) {
-        const video = container.querySelector('video');
+// 增强的视频检测功能，支持Shadow DOM和常见播放器
+function findVideoElement() {
+    // 1. 查找标准video元素
+    let video = document.querySelector('video');
+    if (video) return video;
+    
+    // 2. 查找Shadow DOM中的video
+    const getAllShadowRoots = () => {
+        const roots = [];
+        const walker = (node) => {
+            if (node.shadowRoot) {
+                roots.push(node.shadowRoot);
+                Array.from(node.shadowRoot.children).forEach(walker);
+            }
+        };
+        Array.from(document.querySelectorAll('*')).forEach(walker);
+        return roots;
+    };
+    
+    for (const root of getAllShadowRoots()) {
+        video = root.querySelector('video');
         if (video) return video;
     }
-
-    // 3. 最后尝试iframe内容
-    const iframes = Array.from(document.querySelectorAll('iframe'))
-        .filter(iframe => {
-            try {
-                return iframe.contentDocument && 
-                       iframe.offsetWidth > 100 && 
-                       !iframe.src.startsWith('about:blank');
-            } catch (e) {
-                return false;
-            }
-        });
-
-    for (const iframe of iframes) {
-        try {
-            const iframeDoc = iframe.contentDocument;
-            const iframeVideo = iframeDoc.querySelector('video');
-            if (iframeVideo && iframeVideo.readyState > 0) {
-                return iframeVideo;
-            }
-        } catch (e) {
-            console.log('无法访问iframe内容:', e);
+    
+    // 3. 查找常见播放器容器中的video
+    const playerContainers = [
+        '.prism-player', '.xgplayer', '.dplayer',
+        '.video-js', '.jw-player', '.flowplayer'
+    ];
+    
+    for (const selector of playerContainers) {
+        const container = document.querySelector(selector);
+        if (container) {
+            video = container.querySelector('video');
+            if (video) return video;
         }
     }
-
+    
     return null;
 }
 
-// 最小化页面清理，只移除最必要的干扰元素
-function safelyPreparePage() {
-    // 1. 仅移除明显的控制栏
-    const controlsToRemove = [
-        '.vjs-control-bar', 
-        '.xgplayer-controls',
-        '.prism-controlbar',
-        '.dplayer-controller'
-    ].join(',');
-
-    document.querySelectorAll(controlsToRemove).forEach(el => el.remove());
-
-    // 2. 设置最小必要样式
-    const style = document.createElement('style');
-    style.textContent = `
-        html, body {
-            overflow: hidden !important;
-            background: #000 !important;
-            margin: 0 !important;
-            height: 100% !important;
+// 更安全的控制栏移除功能
+function removePlayerControls() {
+    const selectors = [
+        // 原有选择器
+        '#control_bar_player', '#pic_in_pic_player', '.con.poster',
+        'xg-controls', '.xgplayer-controls', '[data-kp-role=bottom-controls]',
+        '.prism-controlbar', '.vjs-control-bar', '.playback-layer',
+        '.control-bar', '.bitrate-layer', '.volume-layer',
+        '.dplayer-controller', '._tdp_contrl',
+        
+        // 新增选择器
+        '.ad-container', '.ad-banner', '.banner-ad',
+        '.popup', '.modal', '.login-dialog'
+    ];
+    
+    selectors.forEach(selector => {
+        try {
+            document.querySelectorAll(selector).forEach(el => el.remove());
+        } catch (e) {
+            console.log('移除元素失败:', selector, e);
         }
-    `;
-    document.head.appendChild(style);
-
-    // 3. 确保body可见
-    document.body.style.visibility = 'visible';
-    document.body.style.opacity = '1';
+    });
 }
 
-// 安全设置视频全屏
-function setupVideoPlayer(video) {
+// 优化全屏显示功能
+function setupFullscreenVideo(video) {
     if (!video) return;
-
-    // 1. 备份原始视频状态
+    
+    // 备份原始状态
     const originalParent = video.parentNode;
-    const originalNextSibling = video.nextSibling;
     const originalStyle = video.getAttribute('style');
-
-    // 2. 创建安全的容器
+    
+    // 创建全屏容器
     const container = document.createElement('div');
-    container.id = 'video-container';
     container.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: #000;
-        z-index: 9999;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background: #000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        z-index: 9999 !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
     `;
-
-    // 3. 设置视频样式（保留原始尺寸比例）
+    
+    // 设置视频样式
     video.style.cssText = `
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        object-fit: contain !important;
     `;
-
-    // 4. 添加到DOM
+    
+    // 添加到DOM
     container.appendChild(video);
     document.body.innerHTML = '';
     document.body.appendChild(container);
-
-    // 5. 确保播放
+    
+    // 确保播放
     const ensurePlayback = () => {
         if (video.paused) {
-            video.muted = true; // 先尝试静音播放
             video.play().catch(e => {
-                console.log('静音播放失败:', e);
-                // 恢复原始状态
-                container.removeChild(video);
-                originalParent.insertBefore(video, originalNextSibling);
-                if (originalStyle) {
-                    video.setAttribute('style', originalStyle);
-                } else {
-                    video.removeAttribute('style');
-                }
-                video.play().catch(e => console.log('恢复后播放失败:', e));
+                console.log('播放失败，尝试静音播放:', e);
+                video.muted = true;
+                video.play().catch(e => console.log('静音播放失败:', e));
             });
         }
     };
-
+    
     video.addEventListener('loadedmetadata', ensurePlayback);
     video.addEventListener('canplay', ensurePlayback);
     
-    // 6. 通知Android端
+    // 更新分辨率
     Android.changeVideoResolution(
         video.videoWidth || 1920, 
         video.videoHeight || 1080
     );
+    
+    // 返回恢复函数
+    return () => {
+        container.removeChild(video);
+        originalParent.appendChild(video);
+        if (originalStyle) {
+            video.setAttribute('style', originalStyle);
+        } else {
+            video.removeAttribute('style');
+        }
+    };
 }
 
-// 主初始化函数（更保守的实现）
+// 主初始化函数
 function __initializeMain() {
     // 超时处理
     if (Date.now() - ___startTime > 15000) {
@@ -158,28 +142,40 @@ function __initializeMain() {
         Android.updatePlaceholderVisible(true, '加载超时');
         return;
     }
-
-    // 1. 最小化页面准备
-    safelyPreparePage();
-
-    // 2. 查找视频元素
-    const video = findMainVideoElement();
+    
+    const video = findVideoElement();
     console.log('找到的视频元素:', video);
-
-    if (video) {
-        // 3. 设置视频播放
-        setupVideoPlayer(video);
-        clearInterval(my_pollingIntervalId);
-        Android.updatePlaceholderVisible(false, '');
-    } else if (document.readyState === 'complete') {
-        // 如果页面已加载完成但没找到视频
-        clearInterval(my_pollingIntervalId);
-        Android.updatePlaceholderVisible(true, '未找到视频元素');
+    
+    if (video && video.src) {
+        console.log('视频源:', video.src);
+        
+        // 确保音量设置
+        video.muted = false;
+        video.volume = 1;
+        video.autoplay = true;
+        
+        // 如果有画面则设置全屏
+        if (video.videoWidth > 0 && video.videoHeight > 0) {
+            removePlayerControls();
+            setupFullscreenVideo(video);
+            clearInterval(my_pollingIntervalId);
+            Android.updatePlaceholderVisible(false, '');
+        } else {
+            // 如果还没有画面，等待metadata加载
+            video.addEventListener('loadedmetadata', () => {
+                if (video.videoWidth > 0 && video.videoHeight > 0) {
+                    removePlayerControls();
+                    setupFullscreenVideo(video);
+                    clearInterval(my_pollingIntervalId);
+                    Android.updatePlaceholderVisible(false, '');
+                }
+            }, { once: true });
+        }
     }
 }
 
-// 更长的轮询间隔减少性能影响
-const my_pollingIntervalId = setInterval(__initializeMain, 1000);
+// 启动轮询
+const my_pollingIntervalId = setInterval(__initializeMain, 500);
 
 // 初始执行一次
 __initializeMain();
