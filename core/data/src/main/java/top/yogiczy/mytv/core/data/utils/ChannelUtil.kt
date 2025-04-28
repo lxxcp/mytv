@@ -23,7 +23,7 @@ object ChannelUtil {
                 "https://tv.cctv.com/live/cctv2/",
             ),
             ChannelAlias.standardChannelName("CCTV-3 综艺") to listOf(
-                "https://yangshipin.cn/tv/home?pid=600001801"
+                "https://yangshipin.cn/tv/home?pid=600001801",
                 "https://tv.cctv.com/live/cctv3/",
             ),
             ChannelAlias.standardChannelName("CCTV-4 中文国际") to listOf(
@@ -63,8 +63,8 @@ object ChannelUtil {
                 "https://tv.cctv.com/live/cctv11/",             
             ),
             ChannelAlias.standardChannelName("CCTV-12 社会与法") to listOf(
-                "https://tv.cctv.com/live/cctv12/",
                 "https://yangshipin.cn/tv/home?pid=600001807",
+                "https://tv.cctv.com/live/cctv12/",                
             ),
             ChannelAlias.standardChannelName("CCTV-13 新闻") to listOf(
                 "https://yangshipin.cn/tv/home?pid=600001811",
@@ -84,7 +84,7 @@ object ChannelUtil {
                 "https://tv.cctv.com/live/cctv16/",                
             ),
             ChannelAlias.standardChannelName("CCTV-17 农业农村") to listOf(
-                "https://yangshipin.cn/tv/home?pid=600001810"
+                "https://yangshipin.cn/tv/home?pid=600001810", 
                 "https://tv.cctv.com/live/cctv17/",                
             ),
              ChannelAlias.standardChannelName("CCTV-4 中文国际欧洲") to listOf(
