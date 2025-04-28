@@ -32,6 +32,10 @@ object Constants {
             IptvSource(
                 name = "默认直播源",
                 url = "https://gh.tryxd.cn/https://raw.githubusercontent.com/lxxcp/live/main/jxiptv.txt",
+            ),
+            IptvSource(
+                name = "网页源",
+                url = "https://gh.tryxd.cn/https://raw.githubusercontent.com/lxxcp/live/main/webview.txt",
             )
         )
     )
