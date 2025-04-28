@@ -11,29 +11,32 @@ object ChannelUtil {
             ChannelAlias.standardChannelName("CCTV4K 超高清") to listOf(
                  "https://yangshipin.cn/tv/home?pid=600002264",
             ),
+             ChannelAlias.standardChannelName("CCTV8K 超高清") to listOf(
+                 "https://yangshipin.cn/tv/home?pid=600156816",
+            ),
             ChannelAlias.standardChannelName("CCTV-1 综合") to listOf(
-                "https://tv.cctv.com/live/cctv1/",
-                "https://yangshipin.cn/tv/home?pid=600001859",
+                 "https://yangshipin.cn/tv/home?pid=600001859",
+                 "https://tv.cctv.com/live/cctv1/",
             ),
             ChannelAlias.standardChannelName("CCTV-2 财经") to listOf(
-                "https://tv.cctv.com/live/cctv2/",
                 "https://yangshipin.cn/tv/home?pid=600001800",
+                "https://tv.cctv.com/live/cctv2/",
             ),
             ChannelAlias.standardChannelName("CCTV-3 综艺") to listOf(
-                "https://tv.cctv.com/live/cctv3/",
                 "https://yangshipin.cn/tv/home?pid=600001801"
+                "https://tv.cctv.com/live/cctv3/",
             ),
             ChannelAlias.standardChannelName("CCTV-4 中文国际") to listOf(
-                "https://tv.cctv.com/live/cctv4/",
-                "https://yangshipin.cn/tv/home?pid=600001814",
+               "https://yangshipin.cn/tv/home?pid=600001814",
+               "https://tv.cctv.com/live/cctv4/",
             ),
             ChannelAlias.standardChannelName("CCTV-5 体育") to listOf(
-                "https://tv.cctv.com/live/cctv5/",
-                "https://yangshipin.cn/tv/home?pid=600001818",
+               "https://yangshipin.cn/tv/home?pid=600001818",
+               "https://tv.cctv.com/live/cctv5/",
             ),
             ChannelAlias.standardChannelName("CCTV-5+ 体育赛事") to listOf(
-                "https://tv.cctv.com/live/cctv5plus/",
-                "https://yangshipin.cn/tv/home?pid=600001817",
+               "https://yangshipin.cn/tv/home?pid=600001817",
+               "https://tv.cctv.com/live/cctv5plus/",
             ),
             ChannelAlias.standardChannelName("CCTV-6 电影") to listOf(
                 "https://tv.cctv.com/live/cctv6/",
@@ -44,45 +47,45 @@ object ChannelUtil {
                 "https://yangshipin.cn/tv/home?pid=600004092",
             ),
             ChannelAlias.standardChannelName("CCTV-8 电视剧") to listOf(
-                "https://tv.cctv.com/live/cctv8/",
-                "https://yangshipin.cn/tv/home?pid=600001803"
+                "https://yangshipin.cn/tv/home?pid=600001803",
+                     "https://tv.cctv.com/live/cctv8/",
             ),
             ChannelAlias.standardChannelName("CCTV-9 纪录") to listOf(
-                "https://tv.cctv.com/live/cctvjilu/",
                 "https://yangshipin.cn/tv/home?pid=600004078",
+                "https://tv.cctv.com/live/cctvjilu/",               
             ),
             ChannelAlias.standardChannelName("CCTV-10 科教") to listOf(
-                "https://tv.cctv.com/live/cctv10/",
                 "https://yangshipin.cn/tv/home?pid=600001805",
+                "https://tv.cctv.com/live/cctv10/",                
             ),
             ChannelAlias.standardChannelName("CCTV-11 戏曲") to listOf(
-                "https://tv.cctv.com/live/cctv11/",
                 "https://yangshipin.cn/tv/home?pid=600001806",
+                "https://tv.cctv.com/live/cctv11/",             
             ),
             ChannelAlias.standardChannelName("CCTV-12 社会与法") to listOf(
                 "https://tv.cctv.com/live/cctv12/",
                 "https://yangshipin.cn/tv/home?pid=600001807",
             ),
             ChannelAlias.standardChannelName("CCTV-13 新闻") to listOf(
-                "https://tv.cctv.com/live/cctv13/",
                 "https://yangshipin.cn/tv/home?pid=600001811",
+                "https://tv.cctv.com/live/cctv13/",                
             ),
             ChannelAlias.standardChannelName("CCTV-14 少儿") to listOf(
+                 "https://yangshipin.cn/tv/home?pid=600001809",
                 "https://tv.cctv.com/live/cctvchild/",
-                "https://yangshipin.cn/tv/home?pid=600001809",
             ),
             ChannelAlias.standardChannelName("CCTV-15 音乐") to listOf(
-                "https://tv.cctv.com/live/cctv15/",
                 "https://yangshipin.cn/tv/home?pid=600001815",
+                "https://tv.cctv.com/live/cctv15/",                
             ),
             ChannelAlias.standardChannelName("CCTV-16 奥林匹克") to listOf(
-                "https://tv.cctv.com/live/cctv16/",
                 "https://yangshipin.cn/tv/home?pid=600099502",
                 "https://yangshipin.cn/tv/home?pid=600098637",
+                "https://tv.cctv.com/live/cctv16/",                
             ),
             ChannelAlias.standardChannelName("CCTV-17 农业农村") to listOf(
-                "https://tv.cctv.com/live/cctv17/",
                 "https://yangshipin.cn/tv/home?pid=600001810"
+                "https://tv.cctv.com/live/cctv17/",                
             ),
              ChannelAlias.standardChannelName("CCTV-4 中文国际欧洲") to listOf(
                 "https://tv.cctv.com/live/cctveurope/index.shtml",
