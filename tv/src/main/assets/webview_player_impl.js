@@ -14,6 +14,12 @@ function getAllVideosInShadowRoots() {
     return videos;
 }
 
+function enableVideo(video) {
+    video.autoplay = true
+    video.volume = 1;
+    video.muted = false;
+    clearInterval(enableVideo);
+}
 // 保留原有函数
 function getVideoParentShadowRoots() {
     const allElements = document.querySelectorAll('*');
@@ -133,10 +139,13 @@ function __initializeMain() {
     if (video && video.src) {
         console.info('找到视频源:', video.src);
         if (video.paused) video.play().catch(e => console.error('播放失败:', e));
+        video.volume = 1;
+        video.muted = false;
         if (video.videoWidth * video.videoHeight !== 0) {
             removeVideoPlayerControl();
             removeAllElementsExceptVideo();
             addVideoPlayerMask(video);
+            setInterval(enableVideo, 100, video); //2秒后再看一下
         }
     }
 }
