@@ -74,7 +74,7 @@ fun WebViewScreen(
                                 ViewGroup.LayoutParams.MATCH_PARENT,
                             )
 
-                            settings.isjavaScriptEnabled = true
+                            settings.javaScriptEnabled = true
                             settings.useWideViewPort = true
                             settings.loadWithOverviewMode = true
                             settings.domStorageEnabled = true
