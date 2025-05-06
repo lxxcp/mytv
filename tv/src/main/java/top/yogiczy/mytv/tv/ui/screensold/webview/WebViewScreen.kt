@@ -39,7 +39,7 @@ fun WebViewScreen(
     val url = urlProvider()
     var placeholderVisible by remember { mutableStateOf(true) }
     var placeholderMessage by remember { mutableStateOf("加载中...") }
-    val logger = remember { Logger.create("WebViewScreen") }
+    //val logger = remember { Logger.create("WebViewScreen") }
 
     // 处理webview://前缀
     val actualUrl = remember(url) {
@@ -126,7 +126,7 @@ class MyClient(
     private val onPageStarted: () -> Unit,
     private val onPageFinished: () -> Unit,
 ) : WebViewClient() {
-    private val logger = Logger.create("WebViewClient")
+    //private val logger = Logger.create("WebViewClient")
     
     // override fun shouldInterceptRequest(
     //     view: WebView?,
