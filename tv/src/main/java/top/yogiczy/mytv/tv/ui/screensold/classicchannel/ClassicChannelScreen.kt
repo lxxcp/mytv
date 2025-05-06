@@ -143,7 +143,7 @@ fun ClassicChannelScreen(
                 modifier = Modifier
                     .onSizeChanged { channelListWidth = it.width }
                     .focusProperties {
-                        onExit = {
+                        exit = {
                             if (epgListVisible && it == FocusDirection.Left) {
                                 epgListVisible = false
                                 FocusRequester.Cancel
