@@ -31,19 +31,26 @@ import top.yogiczy.mytv.core.data.utils.Logger
 import top.yogiczy.mytv.tv.ui.material.Visibility
 import top.yogiczy.mytv.tv.ui.screensold.webview.components.WebViewPlaceholder
 import java.io.File
+import java.nio.charset.Charset
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun WebViewScreen(
     modifier: Modifier = Modifier,
-    urlProvider: () -> String = { "webview://http://www.jmtv.cn/live/jm_live_h5.shtml?pid=2" },
+    urlProvider: () -> String = { "webview://https://tv.cctv.com/live/index.shtml" },
     onVideoResolutionChanged: (width: Int, height: Int) -> Unit = { _, _ -> },
 ) {
     val url = urlProvider().removePrefix("webview://")
     var placeholderVisible by remember { mutableStateOf(true) }
-
+    var placeholderMessage by remember { mutableStateOf("加载中...") }
     val context = LocalContext.current
     var isCoreReplaced by remember { mutableStateOf(false) }
+
+    val onUpdatePlaceholderVisible = { visible: Boolean, message: String ->
+        placeholderVisible = visible
+        placeholderMessage = message
+    }
+
     LaunchedEffect(Unit) {
         isCoreReplaced = WebViewManager.isCoreReplaced()
 
@@ -64,42 +71,18 @@ fun WebViewScreen(
                     factory = {
                         X5WebView(it).apply {
                             webViewClient = X5WebviewClient(
-                                onPageStarted = { placeholderVisible = true },
+                                onPageStarted = { 
+                                    placeholderVisible = true
+                                    placeholderMessage = "加载中..."
+                                },
                                 onPageFinished = { placeholderVisible = false },
                             )
 
-                            setBackgroundColor(Color.Black.toArgb())
-                            layoutParams = ViewGroup.LayoutParams(
-                                ViewGroup.LayoutParams.MATCH_PARENT,
-                                ViewGroup.LayoutParams.MATCH_PARENT,
-                            )
-
-                            settings.apply {
-                                javaScriptEnabled = true
-                                useWideViewPort = true
-                                loadWithOverviewMode = true
-                                domStorageEnabled = true
-                                cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
-                                loadsImagesAutomatically = false
-                                blockNetworkImage = true
-                                userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0"
-                                javaScriptCanOpenWindowsAutomatically = true
-                                setSupportZoom(false)
-                                displayZoomControls = false
-                                builtInZoomControls = false
-                                mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-                                mediaPlaybackRequiresUserGesture = false // 允许自动播放
-                            }
-
-                            isHorizontalScrollBarEnabled = false
-                            isVerticalScrollBarEnabled = false
-                            isClickable = false
-                            isFocusable = false
-                            isFocusableInTouchMode = false
-
+                            setupCommonWebViewSettings()
                             addJavascriptInterface(
                                 WebViewInterface(
                                     onVideoResolutionChanged = onVideoResolutionChanged,
+                                    onUpdatePlaceholderVisible = onUpdatePlaceholderVisible
                                 ), "Android"
                             )
                         }
@@ -115,42 +98,18 @@ fun WebViewScreen(
                     factory = {
                         SystemWebView(it).apply {
                             webViewClient = SystemWebviewClient(
-                                onPageStarted = { placeholderVisible = true },
+                                onPageStarted = { 
+                                    placeholderVisible = true
+                                    placeholderMessage = "加载中..."
+                                },
                                 onPageFinished = { placeholderVisible = false },
                             )
 
-                            setBackgroundColor(Color.Black.toArgb())
-                            layoutParams = ViewGroup.LayoutParams(
-                                ViewGroup.LayoutParams.MATCH_PARENT,
-                                ViewGroup.LayoutParams.MATCH_PARENT,
-                            )
-
-                            settings.apply {
-                                javaScriptEnabled = true
-                                useWideViewPort = true
-                                loadWithOverviewMode = true
-                                domStorageEnabled = true
-                                cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
-                                loadsImagesAutomatically = false
-                                blockNetworkImage = true
-                                userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0"
-                                javaScriptCanOpenWindowsAutomatically = true
-                                setSupportZoom(false)
-                                displayZoomControls = false
-                                builtInZoomControls = false
-                                mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-                                mediaPlaybackRequiresUserGesture = false // 允许自动播放
-                            }
-
-                            isHorizontalScrollBarEnabled = false
-                            isVerticalScrollBarEnabled = false
-                            isClickable = false
-                            isFocusable = false
-                            isFocusableInTouchMode = false
-
+                            setupCommonWebViewSettings()
                             addJavascriptInterface(
                                 WebViewInterface(
                                     onVideoResolutionChanged = onVideoResolutionChanged,
+                                    onUpdatePlaceholderVisible = onUpdatePlaceholderVisible
                                 ), "Android"
                             )
                         }
@@ -159,12 +118,78 @@ fun WebViewScreen(
                 )
             }
 
-            Visibility({ placeholderVisible }) { WebViewPlaceholder() }
+            Visibility({ placeholderVisible }) {
+                WebViewPlaceholder(message = placeholderMessage)
+            }
         }
     }
 }
 
-// ================== 修改后的关键部分 ==================
+private fun Any.setupCommonWebViewSettings() {
+    when (this) {
+        is android.webkit.WebView -> {
+            setBackgroundColor(Color.Black.toArgb())
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+            )
+
+            settings.apply {
+                javaScriptEnabled = true
+                useWideViewPort = true
+                loadWithOverviewMode = true
+                domStorageEnabled = true
+                cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
+                loadsImagesAutomatically = false
+                blockNetworkImage = true
+                userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0"
+                javaScriptCanOpenWindowsAutomatically = true
+                setSupportZoom(false)
+                displayZoomControls = false
+                builtInZoomControls = false
+                mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                mediaPlaybackRequiresUserGesture = false
+            }
+
+            isHorizontalScrollBarEnabled = false
+            isVerticalScrollBarEnabled = false
+            isClickable = false
+            isFocusable = false
+            isFocusableInTouchMode = false
+        }
+        is com.tencent.smtt.sdk.WebView -> {
+            setBackgroundColor(Color.Black.toArgb())
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+            )
+
+            settings.apply {
+                javaScriptEnabled = true
+                useWideViewPort = true
+                loadWithOverviewMode = true
+                domStorageEnabled = true
+                cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
+                loadsImagesAutomatically = false
+                blockNetworkImage = true
+                userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0"
+                javaScriptCanOpenWindowsAutomatically = true
+                setSupportZoom(false)
+                displayZoomControls = false
+                builtInZoomControls = false
+                mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                mediaPlaybackRequiresUserGesture = false
+            }
+
+            isHorizontalScrollBarEnabled = false
+            isVerticalScrollBarEnabled = false
+            isClickable = false
+            isFocusable = false
+            isFocusableInTouchMode = false
+        }
+    }
+}
+
 private class SystemWebviewClient(
     private val onPageStarted: () -> Unit,
     private val onPageFinished: () -> Unit,
@@ -175,47 +200,27 @@ private class SystemWebviewClient(
         super.onPageStarted(view, url, favicon)
     }
 
+    private fun readAssetFile(context: Context, fileName: String): String {
+        return context.assets.open(fileName).use { inputStream ->
+            val size = inputStream.available()
+            val buffer = ByteArray(size)
+            inputStream.read(buffer)
+            String(buffer, Charset.forName("UTF-8"))
+        }
+    }
+
     override fun onPageFinished(view: android.webkit.WebView, url: String) {
-        view.evaluateJavascript(
-            """
-            ;(async () => {
-                function delay(ms) {
-                    return new Promise(resolve => setTimeout(resolve, ms));
-                }
-
-                let videoEl;
-                while (true) {
-                    videoEl = document.querySelector('video, [class*="video"]');
-                    if (!videoEl) {
-                        await delay(100);
-                        continue;
-                    }
-
-                    // 强制全屏样式
-                    videoEl.style = 'width: 100%!important; height: 100%!important; object-fit: contain!important;';
-                    document.documentElement.style = 'width: 100%!important; height: 100%!important; overflow: hidden!important;';
-                    document.body.style = 'margin: 0!important; padding: 0!important; background: #000!important;';
-
-                    // 移除非视频元素
-                    Array.from(document.body.children).forEach(el => {
-                        if (el !== videoEl) el.remove();
-                    });
-
-                    // 自动播放和音量设置
-                    videoEl.volume = 1;
-                    videoEl.muted = false;
-                    videoEl.autoplay = true;
-                    try { await videoEl.play(); } catch (e) { console.error(e); }
-
-                    // 分辨率回调
-                    Android.changeVideoResolution(videoEl.videoWidth, videoEl.videoHeight);
-                    break;
-                }
-            })()
-            """.trimIndent()
-        ) {
+        val scriptContent = readAssetFile(view.context, "webview_player.js")
+        view.evaluateJavascript(scriptContent.trimIndent()) {
             onPageFinished()
         }
+    }
+}
+
+private class SystemWebView(context: Context) : android.webkit.WebView(context) {
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        return false
     }
 }
 
@@ -233,59 +238,22 @@ private class X5WebviewClient(
         super.onPageStarted(view, url, favicon)
     }
 
+    private fun readAssetFile(context: Context, fileName: String): String {
+        return context.assets.open(fileName).use { inputStream ->
+            val size = inputStream.available()
+            val buffer = ByteArray(size)
+            inputStream.read(buffer)
+            String(buffer, Charset.forName("UTF-8"))
+        }
+    }
+
     override fun onPageFinished(view: com.tencent.smtt.sdk.WebView, url: String) {
-        view.evaluateJavascript(
-            """
-            ;(async () => {
-                function delay(ms) {
-                    return new Promise(resolve => setTimeout(resolve, ms));
-                }
-
-                let videoEl;
-                while (true) {
-                    videoEl = document.querySelector('video, [class*="video"]');
-                    if (!videoEl) {
-                        await delay(100);
-                        continue;
-                    }
-
-                    // 强制全屏样式
-                    videoEl.style = 'width: 100%!important; height: 100%!important; object-fit: contain!important;';
-                    document.documentElement.style = 'width: 100%!important; height: 100%!important; overflow: hidden!important;';
-                    document.body.style = 'margin: 0!important; padding: 0!important; background: #000!important;';
-
-                    // 移除非视频元素
-                    Array.from(document.body.children).forEach(el => {
-                        if (el !== videoEl) el.remove();
-                    });
-
-                    // 自动播放和音量设置
-                    videoEl.volume = 1;
-                    videoEl.muted = false;
-                    videoEl.autoplay = true;
-                    try { await videoEl.play(); } catch (e) { console.error(e); }
-
-                    // 分辨率回调
-                    Android.changeVideoResolution(videoEl.videoWidth, videoEl.videoHeight);
-                    break;
-                }
-            })()
-            """.trimIndent()
-        ) {
+        val scriptContent = readAssetFile(view.context, "webview_player.js")
+        view.evaluateJavascript(scriptContent.trimIndent()) {
             onPageFinished()
         }
     }
 }
-
-
-private class SystemWebView(context: Context) : android.webkit.WebView(context) {
-    @SuppressLint("ClickableViewAccessibility")
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        return false
-    }
-}
-
-
 
 private class X5WebView(context: Context) : com.tencent.smtt.sdk.WebView(context) {
     @SuppressLint("ClickableViewAccessibility")
@@ -296,15 +264,16 @@ private class X5WebView(context: Context) : com.tencent.smtt.sdk.WebView(context
 
 private class WebViewInterface(
     private val onVideoResolutionChanged: (width: Int, height: Int) -> Unit = { _, _ -> },
+    private val onUpdatePlaceholderVisible: (visible: Boolean, message: String) -> Unit = { _, _ -> }
 ) {
     @JavascriptInterface
     fun changeVideoResolution(width: Int, height: Int) {
         onVideoResolutionChanged(width, height)
+        onUpdatePlaceholderVisible(false, "")
     }
 }
 
 object WebViewManager {
-
     private val log = Logger.create("WebViewManager")
     private var coreHasReplaced = false
 
@@ -335,7 +304,6 @@ object WebViewManager {
         }
 
         log.w("X5 core is not loaded. Attempting to preinstall TBS.")
-
         val ok = QbSdk.preinstallStaticTbs(context)
         log.d("TBS core preinstallation initiated: $ok")
     }
