@@ -314,14 +314,13 @@ fun Modifier.saveFocusRestorer(onRestoreFailed: (() -> FocusRequester)? = null):
 
     val focusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(Unit) {
-        runCatching {
-            focusRequester.requestFocus()
-        }.onFailure {
-            onRestoreFailed?.invoke()?.requestFocus()
-        }
-    }
-
-    return this.focusRestorer(focusRequester = focusRequester)
+    return this
+        .focusRestorer(
+            restorer = focusRequester,
+            onRestoreFailed = { 
+                onRestoreFailed?.invoke() ?: FocusRequester.Default 
+            }
+        )
+        .focusRequester(focusRequester) // 确保焦点系统绑定
 }
 fun FocusRequester.saveRequestFocus() = runCatching { requestFocus() }
