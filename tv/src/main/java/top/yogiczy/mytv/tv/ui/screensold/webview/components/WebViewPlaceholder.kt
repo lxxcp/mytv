@@ -15,6 +15,7 @@ import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
 @Composable
 fun WebViewPlaceholder(
     modifier: Modifier = Modifier,
+    message: String = "混合模式（webview）" // 新增message参数，带默认值
 ) {
     Box(
         modifier = modifier
@@ -22,7 +23,7 @@ fun WebViewPlaceholder(
             .background(Color.Black.copy(0.8f)),
     ) {
         Text(
-            text = "混合模式（webview）",
+            text = message, // 使用传入的message
             modifier = Modifier.align(Alignment.Center),
             style = MaterialTheme.typography.titleLarge,
         )
