@@ -110,7 +110,7 @@ fun SimplePopup(
                 composableReference = {
                     PopupContent(
                         modifier = modifier
-                            .focusProperties { onExit = { FocusRequester.Cancel } },
+                            .focusProperties { exit = { FocusRequester.Cancel } },
                         visibleProvider = visibleProvider,
                         onDismissRequest = onDismissRequest,
                         withBackground = true,
