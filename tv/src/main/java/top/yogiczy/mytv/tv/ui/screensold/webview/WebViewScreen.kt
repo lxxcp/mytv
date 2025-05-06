@@ -219,6 +219,64 @@ private class SystemWebviewClient(
     }
 }
 
+private class X5WebviewClient(
+    private val onPageStarted: () -> Unit,
+    private val onPageFinished: () -> Unit,
+) : com.tencent.smtt.sdk.WebViewClient() {
+
+    override fun onPageStarted(
+        view: com.tencent.smtt.sdk.WebView?,
+        url: String?,
+        favicon: Bitmap?
+    ) {
+        onPageStarted()
+        super.onPageStarted(view, url, favicon)
+    }
+
+    override fun onPageFinished(view: com.tencent.smtt.sdk.WebView, url: String) {
+        view.evaluateJavascript(
+            """
+            ;(async () => {
+                function delay(ms) {
+                    return new Promise(resolve => setTimeout(resolve, ms));
+                }
+
+                let videoEl;
+                while (true) {
+                    videoEl = document.querySelector('video, [class*="video"]');
+                    if (!videoEl) {
+                        await delay(100);
+                        continue;
+                    }
+
+                    // 强制全屏样式
+                    videoEl.style = 'width: 100%!important; height: 100%!important; object-fit: contain!important;';
+                    document.documentElement.style = 'width: 100%!important; height: 100%!important; overflow: hidden!important;';
+                    document.body.style = 'margin: 0!important; padding: 0!important; background: #000!important;';
+
+                    // 移除非视频元素
+                    Array.from(document.body.children).forEach(el => {
+                        if (el !== videoEl) el.remove();
+                    });
+
+                    // 自动播放和音量设置
+                    videoEl.volume = 1;
+                    videoEl.muted = false;
+                    videoEl.autoplay = true;
+                    try { await videoEl.play(); } catch (e) { console.error(e); }
+
+                    // 分辨率回调
+                    Android.changeVideoResolution(videoEl.videoWidth, videoEl.videoHeight);
+                    break;
+                }
+            })()
+            """.trimIndent()
+        ) {
+            onPageFinished()
+        }
+    }
+}
+
 
 private class SystemWebView(context: Context) : android.webkit.WebView(context) {
     @SuppressLint("ClickableViewAccessibility")
