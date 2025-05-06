@@ -45,7 +45,7 @@ jobs:
         echo "=== 文件验证 ==="
         echo "当前工作目录: $(pwd)"
         echo "密钥库绝对路径: $(realpath $KEYSTORE_PATH)"
-        ls -lR tv/app
+        ls -lR tv
         if [ ! -s $KEYSTORE_PATH ]; then
           echo "❌ 错误：keystore.jks 文件为空"
           exit 1
