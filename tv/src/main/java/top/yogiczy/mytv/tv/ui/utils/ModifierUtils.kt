@@ -312,15 +312,15 @@ fun NavHostController.navigateSingleTop(route: String) {
 fun Modifier.saveFocusRestorer(onRestoreFailed: (() -> FocusRequester)? = null): Modifier {
     if (!Configs.uiFocusOptimize) return this
 
-    val focusRequester = remember { FocusRequester() }
+    return focusRestorer {
+        if (onRestoreFailed == null) return@focusRestorer FocusRequester.Default
 
-    return this
-        .focusRestorer(
-            restorer = focusRequester,
-            onRestoreFailed = { 
-                onRestoreFailed?.invoke() ?: FocusRequester.Default 
-            }
-        )
-        .focusRequester(focusRequester) // 确保焦点系统绑定
+        val result = onRestoreFailed()
+        runCatching {
+            result.requestFocus()
+            result
+        }.getOrElse { FocusRequester.Default }
+    }
 }
+
 fun FocusRequester.saveRequestFocus() = runCatching { requestFocus() }
