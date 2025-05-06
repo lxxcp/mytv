@@ -22,7 +22,7 @@ android {
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 2
-        versionName = "3.3.9"
+        versionName = System.getenv("VERSION_NAME") ?: "3.3.9"  // ✅ 动态读取环境变量
         vectorDrawables {
             useSupportLibrary = true
         }
