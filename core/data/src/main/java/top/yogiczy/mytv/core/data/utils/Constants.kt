@@ -30,7 +30,6 @@ object Constants {
     val IPTV_SOURCE_LIST = IptvSourceList(
         listOf(
             IptvSource(
-                IptvSource(
                 name = "默认直播源",
                 url = "https://gh.tryxd.cn/https://raw.githubusercontent.com/lxxcp/live/main/jxiptv.txt",
             ),
@@ -54,7 +53,7 @@ object Constants {
             EpgSource(
                 name = "默认节目单",
                 url = "https://gh.tryxd.cn/raw.githubusercontent.com/lxxcp/epg/main/e.xml.gz",
-            ),
+            )
         )
     )
 
