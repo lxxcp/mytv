@@ -1,0 +1,106 @@
+name: Kotlin CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "输入版本号（格式：x.x.x，例如 1.2.3）"
+        required: true
+  push:
+    branches:
+      - 'feature/ui'  # 仅当推送到 feature/ui 分支时触发
+    tags:
+      - "v*"  # 支持 Tag 触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: keystore
+    env:
+      KEYSTORE_PATH: tv/keystore.jks
+      KEYSTORE_TYPE: PKCS12
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # 获取完整 Git 历史记录
+        ref: 'feature/ui'  # 关键修改：始终强制检出 feature/ui 分支
+        
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: 解码生成 jks
+      run: |
+        mkdir -p tv
+        echo "正在解码BASE64密钥..."
+        openssl base64 -d -A <<< "${{ secrets.KEYSTORE_BASE64 }}" > $KEYSTORE_PATH
+        echo "=== 文件验证 ==="
+        echo "当前工作目录: $(pwd)"
+        echo "密钥库绝对路径: $(realpath $KEYSTORE_PATH)"
+        ls -lR tv/app
+        if [ ! -s $KEYSTORE_PATH ]; then
+          echo "❌ 错误：keystore.jks 文件为空"
+          exit 1
+        fi
+        echo "验证密钥库..."
+        keytool -list -v \
+          -keystore $KEYSTORE_PATH \
+          -storepass $KEYSTORE_PASSWORD \
+          -storetype $KEYSTORE_TYPE || {
+            echo "❌ 密钥库验证失败";
+            exit 1;
+          }
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Build with Gradle
+      run: |
+        ./gradlew clean  # 清理缓存
+        ./gradlew :tv:assembleRelease --stacktrace -PVERSION_NAME=${{ github.event.inputs.version }}  # 传递版本号
+      env:
+        VERSION_NAME: ${{ github.event.inputs.version }}  # 环境变量传递
+        KEYSTORE: ${{ github.workspace }}/tv/keystore.jks
+        KEYSTORE_TYPE: ${{ env.KEYSTORE_TYPE }}
+        KEYSTORE_PASSWORD: ${{ env.KEYSTORE_PASSWORD }}
+        KEY_ALIAS: ${{ env.KEY_ALIAS }}
+        KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
+
+    - name: 上传 APK 到 Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: mytv-android-tv-${{ github.event.inputs.version || github.ref_name }}-release.apk
+        path: tv/build/outputs/apk/original/release/*.apk
+
+    - name: 动态创建 Tag（手动触发时）
+      if: ${{ github.event_name == 'workflow_dispatch' }}
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        TAG_NAME="v${{ github.event.inputs.version }}"
+        git fetch --tags
+        if git rev-parse $TAG_NAME >/dev/null 2>&1; then
+          echo "⚠️ 标签 $TAG_NAME 已存在，强制更新..."
+          git tag -d $TAG_NAME || true
+          git push --delete origin $TAG_NAME || true
+        fi
+        git tag -a $TAG_NAME -m "Release $TAG_NAME"
+        git push origin $TAG_NAME
+
+    - name: 上传到 GitHub Release
+      uses: ncipollo/release-action@v1
+      with:
+        name: Release v${{ github.event.inputs.version || github.ref_name }}
+        tag: v${{ github.event.inputs.version || github.ref_name }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: tv/build/outputs/apk/original/release/*.apk
+        allowUpdates: true
+        generateReleaseNotes: true
