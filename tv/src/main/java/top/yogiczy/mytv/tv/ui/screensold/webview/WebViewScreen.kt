@@ -119,7 +119,7 @@ fun WebViewScreen(
             }
 
             Visibility({ placeholderVisible }) {
-                WebViewPlaceholder(message = placeholderMessage)
+                WebViewPlaceholder(Modifier, placeholderMessage)
             }
         }
     }
