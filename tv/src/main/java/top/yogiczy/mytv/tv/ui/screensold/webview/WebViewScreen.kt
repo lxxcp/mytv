@@ -36,7 +36,7 @@ import java.io.File
 @Composable
 fun WebViewScreen(
     modifier: Modifier = Modifier,
-    urlProvider: () -> String = { "webview://https://tv.cctv.com/live/index.shtml" },
+    urlProvider: () -> String = { "webview://http://www.jmtv.cn/live/jm_live_h5.shtml?pid=2" },
     onVideoResolutionChanged: (width: Int, height: Int) -> Unit = { _, _ -> },
 ) {
     val url = urlProvider().removePrefix("webview://")
@@ -74,22 +74,22 @@ fun WebViewScreen(
                                 ViewGroup.LayoutParams.MATCH_PARENT,
                             )
 
-                            settings.javaScriptEnabled = true
-                            settings.useWideViewPort = true
-                            settings.loadWithOverviewMode = true
-                            settings.domStorageEnabled = true
-                            settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
-                            settings.loadsImagesAutomatically = false
-                            settings.blockNetworkImage = true
-                            settings.userAgentString =
-                                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0"
-                            settings.cacheMode = WebSettings.LOAD_DEFAULT
-                            settings.javaScriptCanOpenWindowsAutomatically = true
-                            settings.setSupportZoom(false)
-                            settings.displayZoomControls = false
-                            settings.builtInZoomControls = false
-                            settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-                            settings.mediaPlaybackRequiresUserGesture = false
+                            settings.apply {
+                                javaScriptEnabled = true
+                                useWideViewPort = true
+                                loadWithOverviewMode = true
+                                domStorageEnabled = true
+                                cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
+                                loadsImagesAutomatically = false
+                                blockNetworkImage = true
+                                userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0"
+                                javaScriptCanOpenWindowsAutomatically = true
+                                setSupportZoom(false)
+                                displayZoomControls = false
+                                builtInZoomControls = false
+                                mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                                mediaPlaybackRequiresUserGesture = false // 允许自动播放
+                            }
 
                             isHorizontalScrollBarEnabled = false
                             isVerticalScrollBarEnabled = false
@@ -125,22 +125,22 @@ fun WebViewScreen(
                                 ViewGroup.LayoutParams.MATCH_PARENT,
                             )
 
-                            settings.javaScriptEnabled = true
-                            settings.useWideViewPort = true
-                            settings.loadWithOverviewMode = true
-                            settings.domStorageEnabled = true
-                            settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
-                            settings.loadsImagesAutomatically = false
-                            settings.blockNetworkImage = true
-                            settings.userAgentString =
-                                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0"
-                            settings.cacheMode = WebSettings.LOAD_DEFAULT
-                            settings.javaScriptCanOpenWindowsAutomatically = true
-                            settings.setSupportZoom(false)
-                            settings.displayZoomControls = false
-                            settings.builtInZoomControls = false
-                            settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-                            settings.mediaPlaybackRequiresUserGesture = false
+                            settings.apply {
+                                javaScriptEnabled = true
+                                useWideViewPort = true
+                                loadWithOverviewMode = true
+                                domStorageEnabled = true
+                                cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
+                                loadsImagesAutomatically = false
+                                blockNetworkImage = true
+                                userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0"
+                                javaScriptCanOpenWindowsAutomatically = true
+                                setSupportZoom(false)
+                                displayZoomControls = false
+                                builtInZoomControls = false
+                                mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                                mediaPlaybackRequiresUserGesture = false // 允许自动播放
+                            }
 
                             isHorizontalScrollBarEnabled = false
                             isVerticalScrollBarEnabled = false
@@ -164,6 +164,7 @@ fun WebViewScreen(
     }
 }
 
+// ================== 修改后的关键部分 ==================
 private class SystemWebviewClient(
     private val onPageStarted: () -> Unit,
     private val onPageFinished: () -> Unit,
@@ -181,53 +182,101 @@ private class SystemWebviewClient(
                 function delay(ms) {
                     return new Promise(resolve => setTimeout(resolve, ms));
                 }
-                
-            while (true) {
-              const containerEl = document.querySelector('video')
-              if (!containerEl) {
-                await delay(100)
-                continue
-              }
-        
-              containerEl.style = 'width: 100%; height: 100%;'
-              document.body.style = 'width: 100vw; height: 100vh; margin: 0; min-width: 0; background: #000;'
-              document.body.append(containerEl)
-        
-                ;[...document.body.children].forEach((el) => {
-                  if (el.tagName.toLowerCase() == 'div') {
-                    el.remove()
-                  }
-                })
-        
-              const mask = document.createElement('div')
-              mask.addEventListener('click', () => { })
-              mask.style = 'width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1000;'
-              document.body.append(mask)
-        
-              break
-            }
-        
-            const videoEl = document.querySelector('video')
-        
-            videoEl.volume = 1
-            videoEl.autoplay = true
-            await delay(500)
-            if (videoEl.paused) videoEl.play()
-        
-            while (true) {
-              await delay(500)
-              if (videoEl.videoWidth * videoEl.videoHeight == 0) continue
-        
-              Android.changeVideoResolution(videoEl.videoWidth, videoEl.videoHeight)
-              break
-            }
+
+                let videoEl;
+                while (true) {
+                    videoEl = document.querySelector('video, [class*="video"]');
+                    if (!videoEl) {
+                        await delay(100);
+                        continue;
+                    }
+
+                    // 强制全屏样式
+                    videoEl.style = 'width: 100%!important; height: 100%!important; object-fit: contain!important;';
+                    document.documentElement.style = 'width: 100%!important; height: 100%!important; overflow: hidden!important;';
+                    document.body.style = 'margin: 0!important; padding: 0!important; background: #000!important;';
+
+                    // 移除非视频元素
+                    Array.from(document.body.children).forEach(el => {
+                        if (el !== videoEl) el.remove();
+                    });
+
+                    // 自动播放和音量设置
+                    videoEl.volume = 1;
+                    videoEl.muted = false;
+                    videoEl.autoplay = true;
+                    try { await videoEl.play(); } catch (e) { console.error(e); }
+
+                    // 分辨率回调
+                    Android.changeVideoResolution(videoEl.videoWidth, videoEl.videoHeight);
+                    break;
+                }
             })()
-        """.trimIndent()
+            """.trimIndent()
         ) {
             onPageFinished()
         }
     }
 }
+
+private class X5WebviewClient(
+    private val onPageStarted: () -> Unit,
+    private val onPageFinished: () -> Unit,
+) : com.tencent.smtt.sdk.WebViewClient() {
+
+    override fun onPageStarted(
+        view: com.tencent.smtt.sdk.WebView?,
+        url: String?,
+        favicon: Bitmap?
+    ) {
+        onPageStarted()
+        super.onPageStarted(view, url, favicon)
+    }
+
+    override fun onPageFinished(view: com.tencent.smtt.sdk.WebView, url: String) {
+        view.evaluateJavascript(
+            """
+            ;(async () => {
+                function delay(ms) {
+                    return new Promise(resolve => setTimeout(resolve, ms));
+                }
+
+                let videoEl;
+                while (true) {
+                    videoEl = document.querySelector('video, [class*="video"]');
+                    if (!videoEl) {
+                        await delay(100);
+                        continue;
+                    }
+
+                    // 强制全屏样式
+                    videoEl.style = 'width: 100%!important; height: 100%!important; object-fit: contain!important;';
+                    document.documentElement.style = 'width: 100%!important; height: 100%!important; overflow: hidden!important;';
+                    document.body.style = 'margin: 0!important; padding: 0!important; background: #000!important;';
+
+                    // 移除非视频元素
+                    Array.from(document.body.children).forEach(el => {
+                        if (el !== videoEl) el.remove();
+                    });
+
+                    // 自动播放和音量设置
+                    videoEl.volume = 1;
+                    videoEl.muted = false;
+                    videoEl.autoplay = true;
+                    try { await videoEl.play(); } catch (e) { console.error(e); }
+
+                    // 分辨率回调
+                    Android.changeVideoResolution(videoEl.videoWidth, videoEl.videoHeight);
+                    break;
+                }
+            })()
+            """.trimIndent()
+        ) {
+            onPageFinished()
+        }
+    }
+}
+
 
 private class SystemWebView(context: Context) : android.webkit.WebView(context) {
     @SuppressLint("ClickableViewAccessibility")
