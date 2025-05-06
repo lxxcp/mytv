@@ -30,9 +30,14 @@ object Constants {
     val IPTV_SOURCE_LIST = IptvSourceList(
         listOf(
             IptvSource(
-                name = "无效占位订阅源",
-                url = "http://1.2.3.4/live.m3u",
+                IptvSource(
+                name = "默认直播源",
+                url = "https://gh.tryxd.cn/https://raw.githubusercontent.com/lxxcp/live/main/jxiptv.txt",
             ),
+            IptvSource(
+                name = "网页源",
+                url = "https://gh.tryxd.cn/https://raw.githubusercontent.com/lxxcp/live/main/webview.txt",
+            )
         )
     )
 
@@ -47,8 +52,8 @@ object Constants {
     val EPG_SOURCE_LIST = EpgSourceList(
         listOf(
             EpgSource(
-                name = "默认节目单 fanmingming",
-                url = "https://live.fanmingming.com/e.xml",
+                name = "默认节目单",
+                url = "https://gh.tryxd.cn/raw.githubusercontent.com/lxxcp/epg/main/e.xml.gz",
             ),
         )
     )
@@ -68,7 +73,7 @@ object Constants {
      * {name|uppercase} 转成大写
      *
      */
-    const val CHANNEL_LOGO_PROVIDER = "https://live.fanmingming.com/tv/{name|uppercase}.png"
+    const val CHANNEL_LOGO_PROVIDER = "https://gh.tryxd.cn/https://raw.githubusercontent.com/lxxcp/live/main/logo/{name}.png"
 
     /**
      * GitHub加速代理地址
