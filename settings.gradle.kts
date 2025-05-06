@@ -21,7 +21,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "天光云影v3.3"
+rootProject.name = "天光云影"
 
 include(":core:data")
 include(":core:util")
@@ -37,5 +37,5 @@ if (mediaSettingsFile.exists()) {
     apply(from = mediaSettingsFile)
 }
 
-include(":tbsx5")
-project(":tbsx5").projectDir = file("../YYKM/tbsx5")
+//include(":tbsx5")
+//project(":tbsx5").projectDir = file("../YYKM/tbsx5")
