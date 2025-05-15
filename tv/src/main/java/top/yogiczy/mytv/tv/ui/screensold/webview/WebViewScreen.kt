@@ -40,7 +40,7 @@ fun WebViewScreen(
     urlProvider: () -> String = { "https://tv.cctv.com/live/index.shtml" },
     onVideoResolutionChanged: (width: Int, height: Int) -> Unit = { _, _ -> },
 ) {
-    val (url, httpUserAgent) = urlProvider()
+    val url = urlProvider()
     var placeholderVisible by remember { mutableStateOf(true) }
     var placeholderMessage by remember { mutableStateOf("正在加载...") }
     val logger = remember { Logger.create("WebViewScreen") }
