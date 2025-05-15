@@ -61,10 +61,7 @@ fun WebViewScreen(
         placeholderVisible = visible
         placeholderMessage = message
     }
-    var cookies:List<String> = emptyList()
-    if (actualUrl.contains("yangshipin.cn")){
-        cookies = settingsVM.iptvHybridYangshipinCookie.split(";")
-    }
+   
     Box(modifier = modifier.fillMaxSize()) {
         AndroidView(
             modifier = Modifier
@@ -86,14 +83,7 @@ fun WebViewScreen(
                             // placeholderVisible = false
                         },
                     )
-                    val cookieManager = CookieManager.getInstance()
-                    cookieManager.setAcceptCookie(true)
-                    cookieManager.setAcceptThirdPartyCookies(this, true)
-                    cookies.forEach { cookie ->
-                        cookieManager.setCookie(".yangshipin.cn", cookie.trim())
-                    }
-                    cookieManager.flush()
-                    
+                                       
                     setBackgroundColor(Color.Black.toArgb())
                     layoutParams = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
