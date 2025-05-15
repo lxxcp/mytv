@@ -38,8 +38,8 @@ import kotlin.math.min
 @Composable
 fun VideoPlayerControllerPositionCtrl(
     modifier: Modifier = Modifier,
-   currentPositionProvider: () -> String, // 修改为 String
-    durationProvider: () -> Pair<String, String>, // 明确要求 String 对
+    currentPositionProvider: () -> Long = { 0L },
+    durationProvider: () -> Pair<Long, Long> = { 0L to 0L },
     onSeekTo: (Long) -> Unit = {},
 ) {
     var seekToPosition by remember { mutableStateOf<Long?>(null) }
