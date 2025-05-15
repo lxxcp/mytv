@@ -37,7 +37,7 @@ import top.yogiczy.mytv.tv.ui.screen.settings.settingsVM
 @Composable
 fun WebViewScreen(
     modifier: Modifier = Modifier,
-    urlProvider: () -> Pair<String, String> = { Pair("", "") },
+    urlProvider: () -> String = { "https://tv.cctv.com/live/index.shtml" },
     onVideoResolutionChanged: (width: Int, height: Int) -> Unit = { _, _ -> },
 ) {
     val (url, httpUserAgent) = urlProvider()
