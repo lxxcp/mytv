@@ -270,7 +270,7 @@ fun MainContent(
             isVideoPlayerBufferingProvider = { videoPlayerState.isBuffering },
             videoPlayerCurrentPositionProvider = {
                 if (videoPlayerState.currentPosition >= threshold) videoPlayerState.currentPosition
-                else hour0 + videoPlayerState.currentPosition
+                else hour0 to (hour0 + videoPlayerState.currentPosition)
             },
             videoPlayerDurationProvider = {
                 if (videoPlayerState.currentPosition >= threshold) {
