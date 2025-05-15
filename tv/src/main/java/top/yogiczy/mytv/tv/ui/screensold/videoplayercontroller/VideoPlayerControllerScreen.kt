@@ -17,9 +17,6 @@ import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
 import top.yogiczy.mytv.tv.ui.tooling.PreviewWithLayoutGrids
 import top.yogiczy.mytv.tv.ui.utils.backHandler
 import top.yogiczy.mytv.tv.ui.utils.focusOnLaunchedSaveable
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @Composable
 fun VideoPlayerControllerScreen(
@@ -33,11 +30,6 @@ fun VideoPlayerControllerScreen(
     onVideoPlayerSeekTo: (Long) -> Unit = {},
     onClose: () -> Unit = {},
 ) {
-    // 新增时间格式化函数
-    fun formatTime(timeMs: Long): String {
-        return SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(timeMs))
-    }
-
     Drawer(
         modifier = modifier.backHandler { onClose() },
         onDismissRequest = onClose,
@@ -58,15 +50,8 @@ fun VideoPlayerControllerScreen(
             )
 
             VideoPlayerControllerPositionCtrl(
-                currentPositionProvider = {
-                    // 转换当前位置为字符串（如果需要）
-                    formatTime(videoPlayerCurrentPositionProvider())
-                },
-                durationProvider = {
-                    // 转换持续时间为字符串对
-                    val (start, end) = videoPlayerDurationProvider()
-                    formatTime(start) to formatTime(end)
-                },
+                currentPositionProvider = videoPlayerCurrentPositionProvider,
+                durationProvider = videoPlayerDurationProvider,
                 onSeekTo = onVideoPlayerSeekTo,
             )
         }
