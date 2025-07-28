@@ -75,12 +75,10 @@ fun WebViewScreen(
                             placeholderVisible = true
                             placeholderMessage = "正在加载网页，请稍候..."
                             logger.i("WebView开始加载页面")
-                            // placeholderVisible = false
                         },
                         onPageFinished = { 
                             placeholderMessage = "网页页面加载完成，正在初始化..."
                             logger.i("WebView页面加载完成")
-                            // placeholderVisible = false
                         },
                     )
                                        
@@ -140,8 +138,9 @@ class MyClient(
         request: WebResourceRequest?
     ): WebResourceResponse? {
         val url = request?.url.toString() ?: ""
-        if (!url.contains("jstv.com") && !url.contains("yangshipin.cn") && !url.contains("cztv.com") && url.endsWith(".css")) {
-            return WebResourceResponse("text/css", "UTF-8", null) // 返回空响应以阻止加载
+        // 阻止CSS加载以减少页面干扰
+        if (url.endsWith(".css")) {
+            return WebResourceResponse("text/css", "UTF-8", null)
         }
         return super.shouldInterceptRequest(view, request)
     }
@@ -165,8 +164,7 @@ class MyClient(
         onPageFinished()
         val scriptContent = readAssetFile(view.context, "webview_player.js")
         logger.i("注入脚本到WebView")
-        view.evaluateJavascript(scriptContent.trimIndent()
-        ) {
+        view.evaluateJavascript(scriptContent.trimIndent()) {
             logger.i("脚本注入完成")
         }
         logger.i("WebView页面注入完成: $url")
