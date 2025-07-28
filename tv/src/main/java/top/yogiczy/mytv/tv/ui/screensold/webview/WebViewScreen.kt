@@ -60,7 +60,6 @@ fun WebViewScreen(
     val onUpdatePlaceholderVisible = { visible: Boolean, message: String ->
         placeholderVisible = visible
         placeholderMessage = message
-        logger.i("更新占位状态: $visible, 消息: $message")
     }
    
     Box(modifier = modifier.fillMaxSize()) {
@@ -76,12 +75,13 @@ fun WebViewScreen(
                             placeholderVisible = true
                             placeholderMessage = "正在加载网页，请稍候..."
                             logger.i("WebView开始加载页面")
+                            // placeholderVisible = false
                         },
                         onPageFinished = { 
-                            placeholderMessage = "网页加载完成，正在初始化播放器..."
+                            placeholderMessage = "网页页面加载完成，正在初始化..."
                             logger.i("WebView页面加载完成")
+                            // placeholderVisible = false
                         },
-                        logger = logger
                     )
                                        
                     setBackgroundColor(Color.Black.toArgb())
@@ -90,31 +90,21 @@ fun WebViewScreen(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                     )
 
-                    // 增强的WebView设置
-                    settings.apply {
-                        javaScriptEnabled = true
-                        useWideViewPort = true
-                        loadWithOverviewMode = true
-                        domStorageEnabled = true
-                        loadsImagesAutomatically = false
-                        blockNetworkImage = true
-                        userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0"
-                        cacheMode = WebSettings.LOAD_DEFAULT
-                        javaScriptCanOpenWindowsAutomatically = true
-                        setSupportZoom(false)
-                        displayZoomControls = false
-                        builtInZoomControls = false
-                        mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-                        mediaPlaybackRequiresUserGesture = false
-                        domStorageEnabled = true
-                        allowContentAccess = true
-                        allowFileAccess = true
-                        setSupportMultipleWindows(true)
-                        allowUniversalAccessFromFileURLs = true
-                        allowFileAccessFromFileURLs = true
-                        databaseEnabled = true
-                    }
-
+                    settings.javaScriptEnabled = true
+                    settings.useWideViewPort = true
+                    settings.loadWithOverviewMode = true
+                    settings.domStorageEnabled = true
+                    settings.loadsImagesAutomatically = false
+                    settings.blockNetworkImage = true
+                    settings.userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0"
+                    settings.cacheMode = WebSettings.LOAD_DEFAULT
+                    settings.javaScriptCanOpenWindowsAutomatically = true
+                    settings.setSupportZoom(false)
+                    settings.displayZoomControls = false
+                    settings.builtInZoomControls = false
+                    settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                    settings.mediaPlaybackRequiresUserGesture = false
+                    settings.domStorageEnabled = true
                     isHorizontalScrollBarEnabled = false
                     isVerticalScrollBarEnabled = false
                     isClickable = false
@@ -126,15 +116,11 @@ fun WebViewScreen(
                         MyWebViewInterface(
                             onVideoResolutionChanged = onVideoResolutionChanged,
                             onUpdatePlaceholderVisible = onUpdatePlaceholderVisible,
-                            logger = logger
                         ), "Android"
                     )
                 }
             },
-            update = { webView ->
-                webView.loadUrl(actualUrl)
-                logger.i("开始加载URL: $actualUrl")
-            },
+            update = { it.loadUrl(actualUrl) },
         )
 
         Visibility({ placeholderVisible }) {
@@ -146,81 +132,44 @@ fun WebViewScreen(
 class MyClient(
     private val onPageStarted: () -> Unit,
     private val onPageFinished: () -> Unit,
-    private val logger: Logger
 ) : WebViewClient() {
+    private val logger = Logger.create("WebViewClient")
     
-    // 拦截请求，允许特定域名的资源
     override fun shouldInterceptRequest(
         view: WebView?,
         request: WebResourceRequest?
     ): WebResourceResponse? {
-        val url = request?.url.toString()
-        logger.d("请求资源: $url")
-        
-        // 允许特定电视台域名的资源
-        val allowedDomains = listOf(
-            "jncqrm.cn", "jntlj.com", "jiyangrongmei.cn",
-            "cctv.com", "cntv.cn", "mgtv.com",
-            "iqiyi.com", "youku.com", "qq.com"
-        )
-        
-        val isAllowed = allowedDomains.any { domain -> url.contains(domain) }
-        
-        if (!isAllowed && (url.endsWith(".css") || url.endsWith(".js"))) {
-            logger.d("阻止加载资源: $url")
-            return WebResourceResponse("text/plain", "UTF-8", null)
+        val url = request?.url.toString() ?: ""
+        if (!url.contains("jstv.com") && !url.contains("yangshipin.cn") && !url.contains("cztv.com") && url.endsWith(".css")) {
+            return WebResourceResponse("text/css", "UTF-8", null) // 返回空响应以阻止加载
         }
-        
         return super.shouldInterceptRequest(view, request)
     }
 
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-        logger.i("页面开始加载: $url")
+        logger.i("WebView页面开始加载: $url")
         onPageStarted()
         super.onPageStarted(view, url, favicon)
     }
 
-    // 从assets读取JS文件
-    private fun readAssetFile(context: Context, fileName: String): String {
-        return try {
-            val inputStream = context.assets.open(fileName)
-            val size = inputStream.available()
-            val buffer = ByteArray(size)
-            inputStream.read(buffer)
-            inputStream.close()
-            String(buffer, Charsets.UTF_8)
-        } catch (e: Exception) {
-            logger.e("读取asset文件失败: ${e.message}")
-            ""
-        }
+    fun readAssetFile(context: Context, fileName: String): String {
+        val inputStream = context.assets.open(fileName)
+        val size = inputStream.available()
+        val buffer = ByteArray(size)
+        inputStream.read(buffer)
+        inputStream.close()
+        return String(buffer, Charsets.UTF_8)
     }
 
     override fun onPageFinished(view: WebView, url: String) {
         onPageFinished()
-        
-        // 注入增强版的JS脚本
         val scriptContent = readAssetFile(view.context, "webview_player.js")
-        if (scriptContent.isNotEmpty()) {
-            logger.i("注入JavaScript脚本")
-            view.evaluateJavascript(scriptContent) {
-                logger.i("JavaScript注入完成")
-            }
-        } else {
-            logger.e("无法读取JavaScript脚本内容")
+        logger.i("注入脚本到WebView")
+        view.evaluateJavascript(scriptContent.trimIndent()
+        ) {
+            logger.i("脚本注入完成")
         }
-        
-        super.onPageFinished(view, url)
-    }
-    
-    // 处理页面加载错误
-    override fun onReceivedError(
-        view: WebView?,
-        errorCode: Int,
-        description: String?,
-        failingUrl: String?
-    ) {
-        logger.e("页面加载错误: $errorCode, $description, $failingUrl")
-        super.onReceivedError(view, errorCode, description, failingUrl)
+        logger.i("WebView页面注入完成: $url")
     }
 }
 
@@ -234,23 +183,15 @@ class MyWebView(context: Context) : WebView(context) {
 class MyWebViewInterface(
     private val onVideoResolutionChanged: (width: Int, height: Int) -> Unit = { _, _ -> },
     private val onUpdatePlaceholderVisible: (visible: Boolean, message: String) -> Unit,
-    private val logger: Logger
 ) {
     @JavascriptInterface
     fun changeVideoResolution(width: Int, height: Int) {
-        logger.i("视频分辨率变化: ${width}x${height}")
         onVideoResolutionChanged(width, height)
         onUpdatePlaceholderVisible(false, "")
     }
 
     @JavascriptInterface
     fun updatePlaceholderVisible(visible: Boolean, message: String) {
-        logger.i("更新占位状态: $visible, 消息: $message")
         onUpdatePlaceholderVisible(visible, message)
-    }
-    
-    @JavascriptInterface
-    fun log(message: String) {
-        logger.d("JS日志: $message")
     }
 }
