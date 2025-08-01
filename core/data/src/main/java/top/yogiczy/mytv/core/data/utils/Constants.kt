@@ -31,11 +31,11 @@ object Constants {
         listOf(
             IptvSource(
                 name = "默认直播源",
-                url = "https://gh.tryxd.cn/https://raw.githubusercontent.com/lxxcp/live/main/jxiptv.txt",
+                url = "https://edgeone.gh-proxy.com/https://raw.githubusercontent.com/lxxcp/live/main/jxiptv.txt",
             ),
             IptvSource(
                 name = "网页源",
-                url = "https://gh.tryxd.cn/https://raw.githubusercontent.com/lxxcp/live/main/webview.txt",
+                url = "https://edgeone.gh-proxy.com/https://raw.githubusercontent.com/lxxcp/live/main/webview.txt",
             )
         )
     )
@@ -52,7 +52,7 @@ object Constants {
         listOf(
             EpgSource(
                 name = "默认节目单",
-                url = "https://gh.tryxd.cn/raw.githubusercontent.com/lxxcp/epg/main/e.xml.gz",
+                url = "https://edgeone.gh-proxy.com/raw.githubusercontent.com/lxxcp/epg/main/e.xml.gz",
             )
         )
     )
@@ -72,12 +72,12 @@ object Constants {
      * {name|uppercase} 转成大写
      *
      */
-    const val CHANNEL_LOGO_PROVIDER = "https://gh.tryxd.cn/https://raw.githubusercontent.com/lxxcp/live/main/logo/{name}.png"
+    const val CHANNEL_LOGO_PROVIDER = "https://edgeone.gh-proxy.com/https://raw.githubusercontent.com/lxxcp/live/main/logo/{name}.png"
 
     /**
      * GitHub加速代理地址
      */
-    const val GITHUB_PROXY = "https://ghp.ci/"
+    const val GITHUB_PROXY = "https://edgeone.gh-proxy.com/"
 
     /**
      * Git最新版本信息
