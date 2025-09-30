@@ -31,7 +31,7 @@ object Constants {
         listOf(
             IptvSource(
                 name = "订阅源",
-                url = "https://gh-proxy.com/https://raw.githubusercontent.com/lxxcp/live/main/webview.txt",
+                url = "https://gh-proxy.com/https://raw.githubusercontent.com/xcpab/tvlive/main/webview.txt",
             ),
         )
     )
@@ -68,7 +68,7 @@ object Constants {
      * {name|uppercase} 转成大写
      *
      */
-    const val CHANNEL_LOGO_PROVIDER = "https://gh-proxy.com/https://raw.githubusercontent.com/lxxcp/live/main/logo/{name}.png"
+    const val CHANNEL_LOGO_PROVIDER = "https://gh-proxy.com/https://raw.githubusercontent.com/xcpab/tvlive/main/logo/{name}.png"
 
     /**
      * GitHub加速代理地址
