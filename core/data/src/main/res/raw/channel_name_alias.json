@@ -661,7 +661,7 @@
         "CGTN-新闻 高清",
         "cgtnen"
     ],
-    "CCTV4K 超高清":[
+    "CCTV4K":[
         "CCTV 4K",
         "CCTV 4 K",
         "CCTV4K超高清",
@@ -672,7 +672,7 @@
         "CCTV-4K超高清",
         "CCTV-4K 超高清"
     ],
-    "CCTV8K 超高清":[
+    "CCTV8K":[
         "CCTV 8K",
         "CCTV 8 K",
         "CCTV8K超高清",
@@ -682,7 +682,7 @@
         "CCTV-8 K",
         "CCTV-8K超高清",
         "CCTV-8K 超高清",
-        "CCTV8K"
+        "CCTV8K 超高清"
     ],
     "CGTN纪录":[
         "CGTN纪录",
